@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { markAsUncloneable } from "worker_threads";
 
 type props = {
   orderTitle: string;
@@ -16,6 +15,7 @@ type props = {
   id: string;
   // no need for total price/total items, this can be computed from hashmap
 };
+
 function propsToString(contents: Map<string, number>): string {
   const data = [...contents.entries()];
   if (data.length == 0) {
@@ -32,33 +32,37 @@ function sumTotal(contents: Map<string, number>) {
 }
 
 function markCompleted() {
-  console.log("mark as completed boilerplate")
+  console.log("mark as completed boilerplate");
 }
 
 function markCancel(id: string) {
-  console.log("marked job " + id + " as completed boilerplate")
+  console.log("marked job " + id + " as completed boilerplate");
 }
 
 export default function Order(props: props) {
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>
-          {props.orderTitle} - {props.client}
-        </CardTitle>
-        <CardDescription>
-          <p>
-            {propsToString(props.orderItems)}
-            <br />
-            <strong>${sumTotal(props.orderItems)}</strong>
-          </p>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>{/* messages/details here */}</CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => markCancel(props.id)}>Cancel</Button>
-        <Button onClick={markCompleted}>Mark as Completed</Button>
-      </CardFooter>
-    </Card>
+    <div className="w-[450px] p-12">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>
+            {props.orderTitle} - {props.client}
+          </CardTitle>
+          <CardDescription>
+            <p>
+              {propsToString(props.orderItems)}
+              <br />
+              <strong>${sumTotal(props.orderItems)}</strong>
+            </p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>{/* messages/details here */}</CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" onClick={() => markCancel(props.id)}>
+            Cancel
+          </Button>
+          <Button onClick={markCompleted}>Mark as Completed</Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
