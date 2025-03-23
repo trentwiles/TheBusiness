@@ -8,61 +8,77 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type props = {
-  orderTitle: string;
-  orderItems: Map<string, number>;
-  client: string;
-  id: string;
-  // no need for total price/total items, this can be computed from hashmap
-};
+import { SingleOrder, OrderItem } from "./OrderGrid"
+import { ReactNode } from "react"
 
-function propsToString(contents: Map<string, number>): string {
-  const data = [...contents.entries()];
-  if (data.length == 0) {
-    return "";
+
+
+function orderToString(contents: OrderItem[]): ReactNode {
+  if (contents.length === 0) {
+    return <></>;
   }
-  return data
-    .map(([key, value]) => "" + `${key} ($${value}), `)
-    .join("")
-    .slice(0, -2);
+
+  const order = contents[0];
+
+  return (
+    <ul>
+      {Object.entries(order).map(([itemName, itemPrice]) => (
+        <li key={itemName}>
+          {itemName} (${itemPrice.toFixed(2)})
+        </li>
+      ))}
+    </ul>
+  );
 }
 
-function sumTotal(contents: Map<string, number>) {
-  return Array.from(contents.values()).reduce((digit, a) => digit + a, 0);
+function sumTotal(contents: OrderItem[]) {
+  let runningTotal: number = 0;
+  
+  Object.entries(contents[0]).map(([, itemPrice]) => (
+    runningTotal += itemPrice
+  ))
+
+  return runningTotal.toFixed(2)
 }
 
-function markCompleted() {
-  console.log("mark as completed boilerplate");
+// todo: actual implementation with fetch
+function markCompleted(id: string) {
+  console.log("marked job " + id + " as completed!");
 }
 
+// todo: actual implementation with fetch
 function markCancel(id: string) {
-  console.log("marked job " + id + " as completed boilerplate");
+  console.log("marked job " + id + " as canceled!");
+}
+
+type props = {
+  orderMetadata: SingleOrder
 }
 
 export default function Order(props: props) {
   return (
-    <div className="w-[450px] p-12">
-      <Card className="w-[350px]">
+    <>
+      <Card className="m-4">
         <CardHeader>
           <CardTitle>
-            {props.orderTitle} - {props.client}
+            {props.orderMetadata.orderTitle} - {props.orderMetadata.client}
           </CardTitle>
           <CardDescription>
             <p>
-              {propsToString(props.orderItems)}
+              {orderToString(props.orderMetadata.orderItems)}
               <br />
-              <strong>${sumTotal(props.orderItems)}</strong>
+              <strong>${sumTotal(props.orderMetadata.orderItems)}</strong>
             </p>
           </CardDescription>
         </CardHeader>
         <CardContent>{/* messages/details here */}</CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={() => markCancel(props.id)}>
+          <Button variant="outline" onClick={() => markCancel(props.orderMetadata.id)}>
             Cancel
           </Button>
-          <Button onClick={markCompleted}>Mark as Completed</Button>
+          <Button onClick={() => markCompleted(props.orderMetadata.id)}>Mark as Completed</Button>
         </CardFooter>
       </Card>
-    </div>
+    </>
   );
 }
