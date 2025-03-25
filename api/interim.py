@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+import uuid
 
 #
 #
@@ -32,6 +33,18 @@ def test_data():
         {"orderTitle":"Sample Order 5","orderItems":[{"Orange Juice": 3.49,"Muffin": 2.25,"Salad": 9.75,"Plastic Cups": 2.89}], "client": "Robin", "id":"8f74329e-531f-49e2-bd93-8d9c1cbbe9f2"}
     ]
     return jsonify(orders=orders)
+
+# fake API login route
+@app.route("/login", methods=["POST"])
+def login():
+    api = request.get_json()
+    if "username" in api and "password" in api:
+        if "admin@trentwil.es" == api["username"] and "password" == api["password"]:
+            return jsonify(login=True, token=uuid.uuid4(), error_msg="")
+        else:
+            return jsonify(login=False, error_msg="invalid username/password"), 403
+    else:
+        return jsonify(login=False, error_msg="Missing username/password"), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

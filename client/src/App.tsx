@@ -4,7 +4,7 @@ import Login from './components/customs/Login'
 
 const App = () => {
   return (
-    // <Sidebar children={<OrderGrid apiPath='http://localhost:5000/orders' />} />
+    // <Sidebar children={<OrderGrid apiPath=`${import.meta.env.BASE_URL}/orders` />} />
     <Sidebar children={<Login enableCreateAccount={false} enableOauth={false} />} />
   )
 }
