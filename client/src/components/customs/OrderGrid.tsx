@@ -56,7 +56,7 @@ export default function OrderGrid(props: props) {
           {isError && <span style={{ color: "red" }}></span>}
           {data && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {data.map((order, count) => (
+              {data.map((order) => (
                 <div
                   key={order.id}
                   className=""

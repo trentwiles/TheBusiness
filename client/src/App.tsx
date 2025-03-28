@@ -28,7 +28,8 @@ const App = () => {
     //     />
     //   }
     // />
-    <Sidebar children={<MonthSalesChart month="8" />}/>
+
+    <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<MonthSalesChart month="8" />}/>
   );
 };
 

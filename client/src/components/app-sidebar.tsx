@@ -8,8 +8,9 @@ import {
   Map,
   PieChart,
   Send,
+  Settings,
   Settings2,
-  SquareTerminal,
+  Popcorn,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -34,21 +35,20 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Orders",
+      icon: Popcorn,
+      isActive: false,
       items: [
+        {
+          title: "Current",
+          url: "#",
+        },
         {
           title: "History",
           url: "#",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
+          title: "Audit Log",
           url: "#",
         },
       ],
@@ -121,40 +121,38 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
       title: "Feedback",
       url: "#",
       icon: Send,
     },
   ],
-  projects: [
+  support: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "Getting Started",
+      url: "/filler-url",
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
+      name: "Placing Your First Order",
+      url: "/filler-url",
       icon: PieChart,
     },
     {
-      name: "Travel",
-      url: "#",
+      name: "Pricing Explained",
+      url: "/filler-url",
       icon: Map,
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type props = {
+  dataMode: "Customer" | "Dasher" | "Administrator";
+}
+
+export function AppSidebar( { dataMode }: props) {
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
-      {...props}
     >
       <SidebarHeader>
         <SidebarMenu>
@@ -165,8 +163,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-medium">Quickwagon</span>
+                  <span className="truncate text-xs" >{dataMode}</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -175,7 +173,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={data.support} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
