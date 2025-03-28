@@ -4,7 +4,7 @@ import Sidebar from "./components/customs/Sidebar";
 import Tracking from "./components/customs/Tracking";
 import { Status } from "./components/customs/Tracking";
 import { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
-import SalesChart from "./components/customs/SalesChart";
+import MonthSalesChart from "./components/customs/MonthSalesChart";
 
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
@@ -28,7 +28,7 @@ const App = () => {
     //     />
     //   }
     // />
-    <Sidebar children={<SalesChart apiUrl="http://localhost:5000/sales" />}/>
+    <Sidebar children={<MonthSalesChart month="8" />}/>
   );
 };
 

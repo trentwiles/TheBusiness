@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import uuid
 import random
+import calendar
 
 #
 #
@@ -64,6 +65,29 @@ def sales():
     sales.append({"month": "November", "value": random.randint(100,1000)})
     sales.append({"month": "December", "value": random.randint(100,1000)})
     return jsonify(sales)
+
+@app.route("/sales/<month>")
+def month(month):
+    monthToNum = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ]
+
+    sales = []
+    for day in range(calendar.monthrange(2025, int(month))[1]):
+        sales.append({"day": (day+1), "orders": random.randint(0,40), "profit": random.randint(0,40)})
+        
+    return jsonify(month=monthToNum[int(month)-1], sales=sales)
 
 if __name__ == '__main__':
     app.run(debug=True)
