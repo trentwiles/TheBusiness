@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 import uuid
+import random
 
 #
 #
@@ -45,6 +46,24 @@ def login():
             return jsonify(login=False, error_msg="invalid username/password"), 403
     else:
         return jsonify(login=False, error_msg="Missing username/password"), 400
+
+# fake sales data for a given order fufiller
+@app.route("/sales")
+def sales():
+    sales = []
+    sales.append({"month": "January", "value": random.randint(100,1000)})
+    sales.append({"month": "February", "value": random.randint(100,1000)})
+    sales.append({"month": "March", "value": random.randint(100,1000)})
+    sales.append({"month": "April", "value": random.randint(100,1000)})
+    sales.append({"month": "May", "value": random.randint(100,1000)})
+    sales.append({"month": "June", "value": random.randint(100,1000)})
+    sales.append({"month": "July", "value": random.randint(100,1000)})
+    sales.append({"month": "August", "value": random.randint(100,1000)})
+    sales.append({"month": "September", "value": random.randint(100,1000)})
+    sales.append({"month": "October", "value": random.randint(100,1000)})
+    sales.append({"month": "November", "value": random.randint(100,1000)})
+    sales.append({"month": "December", "value": random.randint(100,1000)})
+    return jsonify(sales)
 
 if __name__ == '__main__':
     app.run(debug=True)

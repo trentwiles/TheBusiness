@@ -4,29 +4,31 @@ import Sidebar from "./components/customs/Sidebar";
 import Tracking from "./components/customs/Tracking";
 import { Status } from "./components/customs/Tracking";
 import { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
+import SalesChart from "./components/customs/SalesChart";
 
 const App = () => {
-  const orderItemOne: OrderItem = { Lemonade: 2.39 };
-  const orderItemTwo: OrderItem = { "Coke Zero": 12.45 };
+  // const orderItemOne: OrderItem = { Lemonade: 2.39 };
+  // const orderItemTwo: OrderItem = { "Coke Zero": 12.45 };
 
-  const exampleOrder: SingleOrder = {
-    client: "James McDavid",
-    id: "981290382838923932",
-    orderTitle: "Some Random Order",
-    orderItems: [orderItemTwo, orderItemOne],
-  };
+  // const exampleOrder: SingleOrder = {
+  //   client: "James McDavid",
+  //   id: "981290382838923932",
+  //   orderTitle: "Some Random Order",
+  //   orderItems: [orderItemTwo, orderItemOne],
+  // };
   return (
     // <Sidebar children={<OrderGrid apiPath=`${import.meta.env.BASE_URL}/orders` />} />
     // <Sidebar children={<Login enableCreateAccount={false} enableOauth={false} />} />
-    <Sidebar
-      children={
-        <Tracking
-          currentStatus={Status.Preparing}
-          orderID={Math.floor(Math.random() * Math.pow(10, 16))}
-          orders={exampleOrder.orderItems}
-        />
-      }
-    />
+    // <Sidebar
+    //   children={
+    //     <Tracking
+    //       currentStatus={Status.Preparing}
+    //       orderID={Math.floor(Math.random() * Math.pow(10, 16))}
+    //       orders={exampleOrder.orderItems}
+    //     />
+    //   }
+    // />
+    <Sidebar children={<SalesChart apiUrl="http://localhost:5000/sales" />}/>
   );
 };
 
