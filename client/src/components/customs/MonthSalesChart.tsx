@@ -89,6 +89,11 @@ export default function SalesChart({ month }: props) {
     <>
       {isLoading && <Skeleton className="min-h-[200px] w-full" />}
       {data && (
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+          {data.month}
+        </h1>
+      )}
+      {data && (
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
           <BarChart
             accessibilityLayer
@@ -109,6 +114,7 @@ export default function SalesChart({ month }: props) {
           </BarChart>
         </ChartContainer>
       )}
+      <div className="buffer pb-4"></div>
     </>
   );
 }

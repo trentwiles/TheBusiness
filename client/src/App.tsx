@@ -5,6 +5,7 @@ import Tracking from "./components/customs/Tracking";
 import { Status } from "./components/customs/Tracking";
 import { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
 import MonthSalesChart from "./components/customs/MonthSalesChart";
+import { SlidingChart } from "./components/customs/SlidingChart";
 
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
@@ -29,7 +30,7 @@ const App = () => {
     //   }
     // />
 
-    <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<MonthSalesChart month="8" />}/>
+    <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<SlidingChart />}/>
   );
 };
 
