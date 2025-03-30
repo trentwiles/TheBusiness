@@ -12,35 +12,63 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { ShoppingBasket } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ShoppingBasket, CirclePlus } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
-function handleData(data): string[] {
-    console.log(data)
-    return []
+function handleData(data, itemsInBasket): string[] {
+  if ("error_msg" in data) {
+    return [];
+  }
+  const elements: string[] = []
+  data.map((item) => {
+    if (!itemsInBasket.includes(item)) {
+        elements.push(item)
+    }
+  })
+
+  return elements
 }
 
 export default function PlaceRequest() {
   const [itemSearch, setItemSearch] = useState("i");
-  const [searchResult, setSearchResult] = useState<string[]>()
-  const [searchInProgress, setSearchInProgress] = useState(false)
+  const [searchResult, setSearchResult] = useState<string[]>();
+  const [searchInProgress, setSearchInProgress] = useState(false);
+
+  const [itemsInBasket, setItemsInBasket] = useState<string[]>([]);
+
+  // https://stackoverflow.com/q/53253940
+  const firstUpdate = useRef(true);
 
   useEffect(() => {
-    setSearchInProgress(true)
-    fetch(`${import.meta.env.VITE_API_ENDPOINT}/search?q=${itemSearch}`)
+    // don't search on first render
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+
+    setSearchInProgress(true);
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/search?q=${itemSearch.trim()}`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setSearchResult(handleData(data))
+        setSearchResult(handleData(data, itemsInBasket));
         setSearchInProgress(false);
       })
       .catch(() => {
-        console.error("search error, if you see this message report to administrator")
+        console.error(
+          "search error, if you see this message report to administrator"
+        );
         setSearchInProgress(false);
       });
   }, [itemSearch]);
   return (
+    <>
+    <div className="grid grid-cols-4 items-center gap-4">
+        {itemsInBasket.map((ele) => (
+            <Button disabled>{ele}</Button>
+        ))}
+    </div>
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="outline">
@@ -72,6 +100,20 @@ export default function PlaceRequest() {
               onChange={(e) => setItemSearch(e.target.value)}
             />
           </div>
+          <div className="grid grid-cols-2 items-center gap-4">
+            {searchResult?.map((ele) => (
+              <Button
+                onClick={() => {
+                  // First add item to useState
+                  setItemsInBasket([...itemsInBasket, ele]);
+                  // Then remove it from the options
+                  setSearchResult(searchResult.filter((item) => item !== ele));
+                }}
+              >
+                <CirclePlus /> {ele}
+              </Button>
+            ))}
+          </div>
         </div>
         <SheetFooter>
           <SheetClose asChild>
@@ -80,5 +122,6 @@ export default function PlaceRequest() {
         </SheetFooter>
       </SheetContent>
     </Sheet>
+    </>
   );
 }
