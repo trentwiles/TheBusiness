@@ -53,7 +53,7 @@ function chartDataResponseToChartData(input: chartDataResponse) {
     newChartData.push({
       day: `${getMonthNumber(input.month)}/${e.day}`,
       orders: e.orders,
-      profit: e.profit * 0.5,
+      profit: e.profit * import.meta.env.VITE_MOBILE_CHART_MULTIPLIER,
     });
   });
   return newChartData;
@@ -86,8 +86,9 @@ export default function SalesChart({ month }: props) {
       });
   }, []);
   return (
-    <>
-      {isLoading && <Skeleton className="min-h-[200px] w-full" />}
+    <div className="w-full px-4 md:px-8 lg:px-16">
+      {isLoading && <Skeleton className="w-full h-full" />}
+      {isError && <p>Whoops, there's been an issue with the backend</p>}
       {data && (
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           {data.month}
@@ -115,6 +116,6 @@ export default function SalesChart({ month }: props) {
         </ChartContainer>
       )}
       <div className="buffer pb-4"></div>
-    </>
+    </div>
   );
 }

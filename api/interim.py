@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import uuid
 import random
 import calendar
+import time
 
 #
 #
@@ -86,8 +87,31 @@ def month(month):
     sales = []
     for day in range(calendar.monthrange(2025, int(month))[1]):
         sales.append({"day": (day+1), "orders": random.randint(0,40), "profit": random.randint(0,40)})
-        
+    
+    # time delay to test skeleton loader
+    time.sleep(3)
+    
     return jsonify(month=monthToNum[int(month)-1], sales=sales)
+
+@app.route("/search")
+def search():
+    
+    items = [
+        "Apple", "Milk", "Eggs",
+        "Banana", "Bread", "Butter", "Cheese", "Chicken", "Carrots", "Potatoes",
+        "Onions", "Tomatoes", "Lettuce", "Cereal", "Pasta", "Rice", "Beans",
+        "Yogurt", "Orange Juice", "Coffee", "Tea", "Sugar", "Salt", "Pepper",
+        "Olive Oil", "Vinegar", "Flour", "Ground Beef", "Fish", "Broccoli",
+        "Spinach", "Cucumbers", "Bell Peppers", "Garlic", "Strawberries",
+        "Blueberries", "Toilet Paper", "Paper Towels", "Dish Soap", "Laundry Detergent"
+    ]
+
+    
+    q = request.args.get('q', None)
+    if q == None or q == "":
+        return jsonify(error=True, error_msg="Please set a search query"), 400
+    
+    return [item for item in items if str(q).lower() in item.lower()]
 
 if __name__ == '__main__':
     app.run(debug=True)

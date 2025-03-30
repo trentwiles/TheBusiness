@@ -11,11 +11,11 @@ export const SlidingChart = () => {
     <>
       <MonthSalesChart month={month + ""} key={month} />
       <div className="flex justify-center items-center space-x-4 ">
-        <Button variant="outline" size="icon" onClick={() => (month >= 1 && month <= 12) ? setMonth(month - 1) : console.log("month out of range")}>
+        <Button variant="outline" size="icon" onClick={() => setMonth((month + 10) % 12 + 1)}>
           <ChevronLeft />
         </Button>
         <Button>Adjust Month</Button>
-        <Button variant="outline" size="icon" onClick={() => (month >= 1 && month <= 12) ? setMonth(month + 1) : console.log("month out of range")}>
+        <Button variant="outline" size="icon" onClick={() => setMonth((month % 12) + 1)}>
           <ChevronRight />
         </Button>
       </div>
