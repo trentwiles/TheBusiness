@@ -116,6 +116,9 @@ def search():
 @app.route("/modOrder", methods=["POST"])
 def modOrder():
     api = request.get_json()
+    
+    print(api)
+    
     orderID = api.get('orderID', None)
     
     if orderID == None:
@@ -123,6 +126,7 @@ def modOrder():
     
     if orderID == 0:
         orderID = random.randint(1000000, 10000000000)
+        
     items = api.get('orderItems', [])
     
     estimatedTotal = 0
@@ -140,6 +144,9 @@ def submitOrder():
     # No need to resubmit order items, we already have that saved in the database from the modOrders method
     
     api = request.get_json()
+    
+    print(api)
+    
     orderID = api.get('orderID', None)
     if orderID == None:
         return jsonify(error=True, error_msg="Missing orderID param (use modOrder to get a new ID)")

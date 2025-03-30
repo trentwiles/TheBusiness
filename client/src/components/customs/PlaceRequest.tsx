@@ -108,6 +108,7 @@ export default function PlaceRequest() {
           orderPostTip: apiData.postTipTotal,
           tip: apiData.tip,
         });
+        setOrderID(apiData.orderID)
       })
       .catch(() => {
         toast("Unable to connect to API. Check your network connection.");
