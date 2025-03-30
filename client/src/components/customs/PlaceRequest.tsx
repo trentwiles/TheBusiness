@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet,
   SheetClose,
@@ -12,10 +13,19 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { Separator } from "@/components/ui/separator";
+
 import { toast } from "sonner";
 
 import { ShoppingBasket, CirclePlus } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import ConfirmOrderButton from "./snippets/ConfirmOrderButton";
+
+type orderMetadata = {
+  orderPreTip: number;
+  orderPostTip: number;
+  tip: number;
+};
 
 function handleData(data, itemsInBasket): string[] {
   if ("error_msg" in data) {
@@ -32,11 +42,20 @@ function handleData(data, itemsInBasket): string[] {
 }
 
 export default function PlaceRequest() {
+  const [orderID, setOrderID] = useState<number>(0);
+  const [orderDetails, setOrderDetails] = useState<orderMetadata>({
+    orderPostTip: -1,
+    orderPreTip: -1,
+    tip: 0.2,
+  });
+
   const [itemSearch, setItemSearch] = useState("i");
   const [searchResult, setSearchResult] = useState<string[]>();
   const [searchInProgress, setSearchInProgress] = useState(false);
 
   const [itemsInBasket, setItemsInBasket] = useState<string[]>([]);
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // https://stackoverflow.com/q/53253940
   const firstUpdate = useRef(true);
@@ -64,6 +83,39 @@ export default function PlaceRequest() {
         setSearchInProgress(false);
       });
   }, [itemSearch]);
+
+  // *******************************************
+  // add another useEffect here to save the order
+  // *******************************************
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/modOrder`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderItems: itemsInBasket,
+        orderID: orderID != undefined ? orderID : 0,
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((apiData) => {
+        setOrderDetails({
+          orderPreTip: apiData.preTipTotal,
+          orderPostTip: apiData.postTipTotal,
+          tip: apiData.tip,
+        });
+      })
+      .catch(() => {
+        toast("Unable to connect to API. Check your network connection.");
+      });
+  }, [itemsInBasket]);
+
+  // *******************************************
+  // *******************************************
   return (
     <>
       {itemsInBasket.length > 0 ? (
@@ -73,7 +125,7 @@ export default function PlaceRequest() {
       ) : (
         <></>
       )}
-      <div className="grid grid-cols-4 items-center gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
         {itemsInBasket.map((ele) => (
           <Button
             onClick={() => {
@@ -93,15 +145,28 @@ export default function PlaceRequest() {
       </div>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline">
-            <ShoppingBasket /> New Order
+          {/* clear the search query when opening the dialouge */}
+          <Button variant="outline" onClick={() => setItemSearch("")}>
+            <ShoppingBasket />{" "}
+            {itemsInBasket.length > 0 ? (
+              <span>Edit Order</span>
+            ) : (
+              <span>New Order</span>
+            )}
           </Button>
         </SheetTrigger>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>New Order</SheetTitle>
+            <SheetTitle>
+              {itemsInBasket.length > 0 ? (
+                <span>Edit Order</span>
+              ) : (
+                <span>New Order</span>
+              )}
+            </SheetTitle>
             <SheetDescription>
-              Don't forget to press "submit" when you're done!
+              To remove an item, click out of this dialogue, and click the item
+              in the cart.
             </SheetDescription>
           </SheetHeader>
           <div className="grid gap-4 py-4 mx-4">
@@ -113,7 +178,7 @@ export default function PlaceRequest() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Items
+                <CirclePlus /> Item
               </Label>
               <Input
                 id="items"
@@ -138,14 +203,32 @@ export default function PlaceRequest() {
                 </Button>
               ))}
             </div>
+            <div className="grid grid-cols-2 items-center">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted ? true : false}
+                onClick={() => setTermsAccepted(!termsAccepted)}
+              />
+              <Label htmlFor="terms">Accept Terms of Service</Label>
+            </div>
           </div>
           <SheetFooter>
             <SheetClose asChild>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={termsAccepted ? false : true}>
+                Save Changes
+              </Button>
             </SheetClose>
           </SheetFooter>
         </SheetContent>
       </Sheet>
+      <Separator />
+      <ConfirmOrderButton
+        apiEndpoint={`${import.meta.env.VITE_API_ENDPOINT}/submitOrder`}
+        orderID={orderID}
+        orderItems={itemsInBasket}
+        totalBeforeTip={orderDetails.orderPreTip}
+        totalAfterTip={orderDetails.orderPostTip}
+      />
     </>
   );
 }

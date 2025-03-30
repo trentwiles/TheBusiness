@@ -113,5 +113,38 @@ def search():
     
     return [item for item in items if str(q).lower() in item.lower()]
 
+@app.route("/modOrder", methods=["POST"])
+def modOrder():
+    api = request.get_json()
+    orderID = api.get('orderID', None)
+    
+    if orderID == None:
+        return jsonify(error=True, error_msg="Missing orderID param (tip: set orderID to 0 for new order)")
+    
+    if orderID == 0:
+        orderID = random.randint(1000000, 10000000000)
+    items = api.get('orderItems', [])
+    
+    estimatedTotal = 0
+    if len(items) > 0:
+        estimatedTotal = random.random() * random.randint(10, (10 * len(items)))
+        
+    tip = 0.20
+    estimatedTotalWithTip = estimatedTotal * (1 + tip)
+    
+    return jsonify(error=False, orderID=orderID, totalItems=len(items), preTipTotal=round(estimatedTotal, 2), tip=str(tip* 100) + "%", postTipTotal=round(estimatedTotalWithTip, 2))
+
+
+@app.route("/submitOrder", methods=["POST"])
+def submitOrder():
+    # No need to resubmit order items, we already have that saved in the database from the modOrders method
+    
+    api = request.get_json()
+    orderID = api.get('orderID', None)
+    if orderID == None:
+        return jsonify(error=True, error_msg="Missing orderID param (use modOrder to get a new ID)")
+    
+    return jsonify(error=False, orderID=orderID)
+
 if __name__ == '__main__':
     app.run(debug=True)
