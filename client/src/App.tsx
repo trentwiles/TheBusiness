@@ -7,6 +7,7 @@ import { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
 import MonthSalesChart from "./components/customs/MonthSalesChart";
 import { SlidingChart } from "./components/customs/SlidingChart";
 import PlaceRequest from "./components/customs/PlaceRequest";
+import { Toaster } from "@/components/ui/sonner";
 
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
@@ -32,7 +33,15 @@ const App = () => {
     // />
 
     //  <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<SlidingChart />}/>
-    <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<PlaceRequest />}/>
+    <>
+      <Sidebar
+        dataMode="Administrator"
+        pageSubclass="Orders"
+        pageTitle="More Information"
+        children={<PlaceRequest />}
+      />
+      <Toaster />
+    </>
   );
 };
 

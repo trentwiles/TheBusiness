@@ -12,6 +12,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { toast } from "sonner";
+
 import { ShoppingBasket, CirclePlus } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
@@ -19,14 +21,14 @@ function handleData(data, itemsInBasket): string[] {
   if ("error_msg" in data) {
     return [];
   }
-  const elements: string[] = []
+  const elements: string[] = [];
   data.map((item) => {
     if (!itemsInBasket.includes(item)) {
-        elements.push(item)
+      elements.push(item);
     }
-  })
+  });
 
-  return elements
+  return elements;
 }
 
 export default function PlaceRequest() {
@@ -64,64 +66,86 @@ export default function PlaceRequest() {
   }, [itemSearch]);
   return (
     <>
-    <div className="grid grid-cols-4 items-center gap-4">
+      {itemsInBasket.length > 0 ? (
+        <h3 className="mt-8 scroll-m-20 text-2xl font-semibold tracking-tight">
+          Order Items
+        </h3>
+      ) : (
+        <></>
+      )}
+      <div className="grid grid-cols-4 items-center gap-4">
         {itemsInBasket.map((ele) => (
-            <Button disabled>{ele}</Button>
+          <Button
+            onClick={() => {
+              setItemsInBasket(itemsInBasket.filter((item) => item !== ele));
+              toast(`${ele} removed from the basket`, {
+                action: {
+                  label: "Undo",
+                  onClick: () => setItemsInBasket((prev) => [...prev, ele]),
+                },
+              });
+            }}
+            className="strike-on-hover"
+          >
+            {ele}
+          </Button>
         ))}
-    </div>
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline">
-          <ShoppingBasket /> New Order
-        </Button>
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>New Order</SheetTitle>
-          <SheetDescription>
-            Don't forget to press "submit" when you're done!
-          </SheetDescription>
-        </SheetHeader>
-        <div className="grid gap-4 py-4 mx-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value="Pedro Duarte" className="col-span-3" />
+      </div>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">
+            <ShoppingBasket /> New Order
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>New Order</SheetTitle>
+            <SheetDescription>
+              Don't forget to press "submit" when you're done!
+            </SheetDescription>
+          </SheetHeader>
+          <div className="grid gap-4 py-4 mx-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input id="name" value="Pedro Duarte" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Items
+              </Label>
+              <Input
+                id="items"
+                value={itemSearch}
+                className="col-span-3"
+                onChange={(e) => setItemSearch(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4">
+              {searchResult?.map((ele) => (
+                <Button
+                  onClick={() => {
+                    // First add item to useState
+                    setItemsInBasket([...itemsInBasket, ele]);
+                    // Then remove it from the options
+                    setSearchResult(
+                      searchResult.filter((item) => item !== ele)
+                    );
+                  }}
+                >
+                  <CirclePlus /> {ele}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Items
-            </Label>
-            <Input
-              id="items"
-              value={itemSearch}
-              className="col-span-3"
-              onChange={(e) => setItemSearch(e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-2 items-center gap-4">
-            {searchResult?.map((ele) => (
-              <Button
-                onClick={() => {
-                  // First add item to useState
-                  setItemsInBasket([...itemsInBasket, ele]);
-                  // Then remove it from the options
-                  setSearchResult(searchResult.filter((item) => item !== ele));
-                }}
-              >
-                <CirclePlus /> {ele}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button type="submit">Save changes</Button>
-          </SheetClose>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button type="submit">Save changes</Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
