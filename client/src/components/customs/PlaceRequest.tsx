@@ -17,7 +17,12 @@ import { Separator } from "@/components/ui/separator";
 
 import { toast } from "sonner";
 
-import { ShoppingBasket, CirclePlus } from "lucide-react";
+import {
+  ShoppingBasket,
+  CirclePlus,
+  CloudOff,
+  CloudDownload,
+} from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import ConfirmOrderButton from "./snippets/ConfirmOrderButton";
 
@@ -89,6 +94,10 @@ export default function PlaceRequest() {
   // *******************************************
 
   useEffect(() => {
+    // ignore for blank orders
+    if (itemsInBasket.length == 0) {
+      return
+    }
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/modOrder`, {
       method: "POST",
       headers: {
@@ -108,10 +117,15 @@ export default function PlaceRequest() {
           orderPostTip: apiData.postTipTotal,
           tip: apiData.tip,
         });
-        setOrderID(apiData.orderID)
+        setOrderID(apiData.orderID);
       })
       .catch(() => {
-        toast("Unable to connect to API. Check your network connection.");
+        toast(
+          <p>
+            <CloudOff /> Unable to connect to the API. Check your network
+            connection.
+          </p>
+        );
       });
   }, [itemsInBasket]);
 
@@ -120,9 +134,15 @@ export default function PlaceRequest() {
   return (
     <>
       {itemsInBasket.length > 0 ? (
-        <h3 className="mt-8 scroll-m-20 text-2xl font-semibold tracking-tight">
-          Order Items
-        </h3>
+        <div className="inProgressOrder">
+          <h3 className="mt-8 scroll-m-20 text-2xl font-semibold tracking-tight">
+            Editing Order #{orderID}
+          </h3>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <CloudDownload className="mr-2" />
+            <span>{searchInProgress ? `Saving changes...` : `All changes saved.`}</span>
+          </div>
+        </div>
       ) : (
         <></>
       )}
@@ -137,6 +157,11 @@ export default function PlaceRequest() {
                   onClick: () => setItemsInBasket((prev) => [...prev, ele]),
                 },
               });
+              // one more message: if that was the last item, we also make note the order was destroyed
+              if (itemsInBasket.length == 0) {
+                toast(`#${orderID} has been deleted`)
+                setOrderID(0)
+              }
             }}
             className="strike-on-hover"
           >
@@ -173,12 +198,6 @@ export default function PlaceRequest() {
           <div className="grid gap-4 py-4 mx-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
                 <CirclePlus /> Item
               </Label>
               <Input
@@ -213,23 +232,30 @@ export default function PlaceRequest() {
               <Label htmlFor="terms">Accept Terms of Service</Label>
             </div>
           </div>
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit" disabled={termsAccepted ? false : true}>
-                Save Changes
-              </Button>
-            </SheetClose>
-          </SheetFooter>
         </SheetContent>
       </Sheet>
-      <Separator />
-      <ConfirmOrderButton
-        apiEndpoint={`${import.meta.env.VITE_API_ENDPOINT}/submitOrder`}
-        orderID={orderID}
-        orderItems={itemsInBasket}
-        totalBeforeTip={orderDetails.orderPreTip}
-        totalAfterTip={orderDetails.orderPostTip}
-      />
+      {orderID != 0 ? (
+        <>
+          <Separator />
+          <ConfirmOrderButton
+            apiEndpoint={`${import.meta.env.VITE_API_ENDPOINT}/submitOrder`}
+            orderID={orderID}
+            orderItems={itemsInBasket}
+            totalBeforeTip={orderDetails.orderPreTip}
+            totalAfterTip={orderDetails.orderPostTip}
+            isEnabled={termsAccepted}
+            // finally, a callback function that wipes everything after the order is submitted
+            pageWipeListener={(doWeWipeEverything: boolean) => {
+              if (doWeWipeEverything) {
+                setOrderID(0)
+                setItemsInBasket([])
+              }
+            }}
+          />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }

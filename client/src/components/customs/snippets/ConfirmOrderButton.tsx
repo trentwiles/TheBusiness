@@ -23,6 +23,12 @@ type props = {
 
   totalBeforeTip: number;
   totalAfterTip: number;
+
+  // only true when the TOS have been accepted
+  isEnabled: boolean;
+
+  // finally, an observer telling the parent to wipe itself
+  pageWipeListener: (wipeEverything: boolean) => void;
 };
 
 type success = true | false | "unknown";
@@ -33,6 +39,8 @@ export default function ConfirmOrderButton({
   orderID,
   totalBeforeTip,
   totalAfterTip,
+  isEnabled,
+  pageWipeListener
 }: props) {
   const [status, setStatus] = useState<success>("unknown");
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -77,12 +85,16 @@ export default function ConfirmOrderButton({
         ? `Order #${orderID} Placed`
         : `Unable to Place Order #${orderID}`
     );
+
+    if (status == true) {
+      pageWipeListener(true)
+    }
   }, [status]);
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show Dialog</Button>
+      <AlertDialogTrigger asChild disabled={isEnabled ? false : true}>
+        <Button variant="outline">{isEnabled ? `Confirm Order` : `Accept Terms of Service`}</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -99,9 +111,9 @@ export default function ConfirmOrderButton({
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={submitOrder}
-            disabled={isPending == true ? true : false}
+            disabled={(isPending == false) ? false : true}
           >
-            {isPending == true ? "Continue" : "Please Wait"}
+            {isPending == false ? "Continue" : "Please Wait"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
