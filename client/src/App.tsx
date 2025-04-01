@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/sonner";
 /* react router related */
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Home from "./components/customs/Home";
 
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
@@ -64,6 +65,15 @@ const App = () => {
     return <Tracking />
   }
 
+  function HomePage({ setPageTitle, setSubclass }) {
+    useEffect(() => {
+      setPageTitle('')
+      setSubclass('')
+    }, [])
+
+    return <Home />
+  }
+
   /* END PAGE DEFINITONS */
 
   return (
@@ -92,7 +102,7 @@ const App = () => {
       >
         {/* BEGIN CUSTOM ROUTES*/}
         <Routes>
-          <Route path="/" element={<p>Iterim Homepage</p>} />
+          <Route path="/" element={<HomePage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
           <Route path="/orders" element={<OrdersPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
           <Route path="/sales-chart" element={<MySales setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
           <Route path="/login" element={<LoginPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />

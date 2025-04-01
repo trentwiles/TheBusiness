@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
 
 type props = {
   enableCreateAccount: boolean;
@@ -17,49 +18,68 @@ type props = {
 };
 
 export default function Login({ enableCreateAccount, enableOauth }: props) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [buttonEnabled, setButtonEnabled] = useState(true)
-  const [loginFailureMessage, setLoginFailureMessage] = useState(null)
+  const [buttonEnabled, setButtonEnabled] = useState(true);
+  const [loginFailureMessage, setLoginFailureMessage] = useState(null);
+
+  // first things first, if the user is already authenticated, kick
+  // them off this page
+  useEffect(() => {
+    fetch("http://localhost:5000", {
+      headers: {
+        Authorization: localStorage.getItem("token") || "",
+      },
+    }).then((response) => {
+      // if the user is authorized we get a 200
+      if (response.status == 200) {
+        navigate("/", { replace: true });
+      }
+    });
+  }, []);
 
   function handleFormSubmit(e, email: string, password: string) {
     e.preventDefault();
 
     // reset login failure message
-    setLoginFailureMessage(null)
+    setLoginFailureMessage(null);
 
     // blank out email & password in state
-    setEmail("")
-    setPassword("")
+    setEmail("");
+    setPassword("");
 
     // disable button
-    setButtonEnabled(false)
+    setButtonEnabled(false);
 
     // submit the login and act based on response from server
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/login`, {
       method: "post",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-    
+
       body: JSON.stringify({
         username: email,
-        password: password
-      })
-    })
-    .then( (response) => { 
+        password: password,
+      }),
+    }).then((response) => {
+      setLoginFailureMessage(null);
       response.json().then((data) => {
         if (response.status != 200) {
-          setButtonEnabled(true)
-          setLoginFailureMessage(data.error_msg)
-        }
+          setButtonEnabled(true);
+          setLoginFailureMessage(data.error_msg);
+        } else {
+          // was a success
+          // handle the token here
+          console.log(`success, your token is ${data.token}`);
+          localStorage.setItem("token", data.token);
 
-        // was a success
-        // handle the token here
-        console.log(`success, your token is ${data.token}`)
-        localStorage.setItem('token', data.token);
-      })
+          navigate("/", { replace: true });
+        }
+      });
     });
   }
 
@@ -124,7 +144,9 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
                 ) : (
                   <></>
                 )}
-                {loginFailureMessage && <span style={{color: "red"}}>{loginFailureMessage}</span>}
+                {loginFailureMessage && (
+                  <span style={{ color: "red" }}>{loginFailureMessage}</span>
+                )}
               </div>
               {enableOauth ? (
                 <div className="mt-4 text-center text-sm">

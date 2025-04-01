@@ -16,10 +16,12 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-
+# Serves as a "check-auth" route
 @app.route("/")
-def hello_world():
-    return jsonify(message="Hello, World!")
+def check_auth():
+    if ("Authorization" in request.headers):
+        return jsonify(username="joe")
+    return jsonify(), 401
 
 
 orders = [

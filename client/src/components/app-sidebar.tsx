@@ -41,15 +41,15 @@ const data = {
       items: [
         {
           title: "Current",
-          url: "#",
+          url: "/orders",
         },
         {
           title: "History",
-          url: "#",
+          url: "/past-orders",
         },
         {
           title: "Audit Log",
-          url: "#",
+          url: "/audit-log",
         },
       ],
     },
@@ -79,19 +79,19 @@ const data = {
       items: [
         {
           title: "Introduction",
-          url: "#",
+          url: "/support/introduction",
         },
         {
           title: "Get Started",
-          url: "#",
+          url: "/support/get-started",
         },
         {
           title: "Tutorials",
-          url: "#",
+          url: "/support",
         },
         {
           title: "Changelog",
-          url: "#",
+          url: "/support/change-log",
         },
       ],
     },
@@ -102,19 +102,15 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
+          url: "/settings",
         },
         {
           title: "Billing",
-          url: "#",
+          url: "/billing",
         },
         {
-          title: "Limits",
-          url: "#",
+          title: "Invoices",
+          url: "/invoices",
         },
       ],
     },
