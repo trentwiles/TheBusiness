@@ -1,8 +1,10 @@
-import {useState} from "react";
+import { useEffect, useState } from "react";
 
 import { Progress } from "@/components/ui/progress";
 
 import { OrderItem } from "@/components/customs/OrderGrid";
+
+import { useParams } from "react-router-dom";
 
 import {
   Card,
@@ -22,6 +24,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+import { toast } from "sonner";
+
 enum Status {
   Preparing,
   Collecting,
@@ -36,6 +40,20 @@ const statusToProgressBarSize: { [key in Status]: number } = {
   [Status.Completed]: 100,
 };
 
+const stringStatusToEnum = (stringStatus: string): Status => {
+  switch (stringStatus) {
+    case "Awaiting":
+      return Status.Awaiting;
+    case "Preparing":
+      return Status.Preparing;
+    case "Collecting":
+      return Status.Collecting;
+    case "Completed":
+      return Status.Completed;
+    default:
+      throw new Error(`${stringStatus} cannot be converted to a state!`);
+  }
+};
 type props = {
   customTitle?: string | "Order Status";
 
@@ -50,28 +68,71 @@ type props = {
   customCompletedDesc?: string;
 
   // REQUIRED
-  orderID: number;
-  currentStatus: Status;
-  orders: OrderItem[];
+  // orderID: number;
+  // currentStatus: Status;
+  // orders: OrderItem[];
 };
 
 export default function Tracking(props: props) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [orderState, setOrderState] = useState<Status>(Status.Awaiting);
+  const [timestamps, setTimestamps] = useState<Record<string, string>>();
+  const [orderContents, setOrderContents] = useState<OrderItem[]>();
+  const [pending, setPending] = useState<boolean>(true);
+  const { id } = useParams();
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/getOrderTrackingStatus?q=${id}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setOrderState(stringStatusToEnum(data.order.status));
+        setTimestamps(data.order.verbose)
+      })
+      .catch((e) => {
+        console.error(
+          "get order tracking error, if you see this message report to administrator"
+        );
+        console.log(e)
+        toast("API error, please see dev console.")
+      });
+
+
+      // need to add another fetch to get order details, the fetch above only gets tracking
+
+      fetch(`${import.meta.env.VITE_API_ENDPOINT}/getOrder?q=${id}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setOrderContents(data.orderItems)
+      })
+      .catch((e) => {
+        console.error(
+          "getorder error, if you see this message report to administrator"
+        );
+        console.log(e)
+        toast("API error, please see dev console.")
+      });
+
+      setPending(false)
+  }, []);
 
   return (
     <>
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        {props.customTitle || "Preparing Order"}
+        {
+          (orderState == 0) ? "Preparing Order" : (orderState == 1) ? "Awaiting Pickup" : (orderState == 2) ? "Collecting Order Items" : "Order Completed" 
+        }
       </h1>
-      <p className="text-sm text-muted-foreground mb-10">
-        Order ID: {props.orderID}
-      </p>
-      <Progress value={statusToProgressBarSize[props.currentStatus]} />
+      <p className="text-sm text-muted-foreground mb-10">Order ID: {id}</p>
+      <Progress value={orderState} />
       {/* four steps: assign to worker, gathering, delivery, completed */}
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 gap-4">
         <Card
           className={`m-4 ${
-            props.currentStatus >= Status.Preparing
+            orderState >= Status.Preparing
               ? ""
               : "opacity-50 pointer-events-none"
           }`}
@@ -87,7 +148,7 @@ export default function Tracking(props: props) {
         </Card>
         <Card
           className={`m-4 ${
-            props.currentStatus >= Status.Collecting
+            orderState >= Status.Collecting
               ? ""
               : "opacity-50 pointer-events-none"
           }`}
@@ -103,7 +164,7 @@ export default function Tracking(props: props) {
         </Card>
         <Card
           className={`m-4 ${
-            props.currentStatus >= Status.Awaiting
+            orderState >= Status.Awaiting
               ? ""
               : "opacity-50 pointer-events-none"
           }`}
@@ -121,7 +182,7 @@ export default function Tracking(props: props) {
         </Card>
         <Card
           className={`m-4 ${
-            props.currentStatus >= Status.Completed
+            orderState >= Status.Completed
               ? ""
               : "opacity-50 pointer-events-none"
           }`}
@@ -140,18 +201,14 @@ export default function Tracking(props: props) {
       <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl px-2">
         Order Details
       </h1>
-      <ul>
-        
-      </ul>
+      <ul></ul>
       <Collapsible
         open={isOpen}
         onOpenChange={setIsOpen}
         className="w-[350px] space-y-2"
       >
         <div className="flex items-center justify-between space-x-4 px-4">
-          <h4 className="text-sm font-semibold">
-            {props.orders.length} items
-          </h4>
+          <h4 className="text-sm font-semibold">{orderContents?.length} items</h4>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm">
               <ChevronsUpDown className="h-4 w-4" />
@@ -160,13 +217,16 @@ export default function Tracking(props: props) {
           </CollapsibleTrigger>
         </div>
         <CollapsibleContent className="space-y-2">
-        {props.orders.map((order, index) =>
-          Object.entries(order).map(([itemName, itemPrice]) => (
-            <div key={index} className="rounded-md border px-4 py-2 text-sm shadow-sm">
-              {itemName} (${itemPrice.toFixed(2)})
-            </div>
-          ))
-        )}
+          {orderContents?.map((order, index) =>
+            Object.entries(order).map(([itemName, itemPrice]) => (
+              <div
+                key={index}
+                className="rounded-md border px-4 py-2 text-sm shadow-sm"
+              >
+                {itemName} (${itemPrice.toFixed(2)})
+              </div>
+            ))
+          )}
         </CollapsibleContent>
       </Collapsible>
     </>

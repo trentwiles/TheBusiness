@@ -55,6 +55,15 @@ const App = () => {
     return <SlidingChart />;
   }
 
+  function TrackingPage({ setPageTitle, setSubclass }) {
+    useEffect(() => {
+      setPageTitle('Order Tracking')
+      setSubclass('Customer')
+    }, [])
+
+    return <Tracking />
+  }
+
   /* END PAGE DEFINITONS */
 
   return (
@@ -87,6 +96,7 @@ const App = () => {
           <Route path="/orders" element={<OrdersPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
           <Route path="/sales-chart" element={<MySales setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
           <Route path="/login" element={<LoginPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
+          <Route path="/track/:id" element={<TrackingPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
         </Routes>
         {/* END CUSTOM ROUTES*/}
         <Toaster />
