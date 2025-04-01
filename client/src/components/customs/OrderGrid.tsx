@@ -1,8 +1,10 @@
 
 import Order from "./Order"
+import { Link } from 'react-router-dom';
 
 
 import { useEffect, useState } from "react";
+import PlaceRequest from "./PlaceRequest";
 
 // item and it's price
 export type OrderItem = {
@@ -23,17 +25,14 @@ type OrdersResponse = {
   orders: SingleOrder[];
 };
 
-type props = {
-    apiPath: string;
-}
 
-export default function OrderGrid(props: props) {
+export default function OrderGrid() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [data, setData] = useState<SingleOrder[]>([]);
 
   useEffect(() => {
-    fetch(props.apiPath)
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/orders`)
       .then((res) => {
         return res.json();
       })
@@ -55,17 +54,22 @@ export default function OrderGrid(props: props) {
           {isLoading && <i>Please wait...</i>}
           {isError && <span style={{ color: "red" }}></span>}
           {data && (
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              
               {data.map((order) => (
-                <div
-                  key={order.id}
-                  className=""
-                >
-                  <Order orderMetadata={order} />
-                </div>
+                <Link to={`/track/${order.id}`} >
+                  <div
+                    key={order.id}
+                    className=""
+                  >
+                    <Order orderMetadata={order} />
+                  </div>
+                </Link>
               ))}
             </div>
           )}
+          <PlaceRequest />
         </>
   );
 }

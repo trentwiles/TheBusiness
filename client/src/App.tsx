@@ -3,7 +3,7 @@ import Sidebar from "./components/customs/Sidebar";
 import Login from './components/customs/Login'
 import Tracking from "./components/customs/Tracking";
 import { Status } from "./components/customs/Tracking";
-import { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
+import OrderGrid, { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
 import MonthSalesChart from "./components/customs/MonthSalesChart";
 import { SlidingChart } from "./components/customs/SlidingChart";
 import PlaceRequest from "./components/customs/PlaceRequest";
@@ -43,7 +43,7 @@ const App = () => {
       setSubclass('Administrator');
     }, []);
   
-    return <PlaceRequest />;
+    return <OrderGrid />;
   }
 
   function MySales({ setPageTitle, setSubclass }) {

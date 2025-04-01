@@ -15,8 +15,9 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, LoaderCircle } from "lucide-react";
 
 import {
   Collapsible,
@@ -74,10 +75,10 @@ type props = {
 };
 
 export default function Tracking(props: props) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [orderState, setOrderState] = useState<Status>(Status.Awaiting);
   const [timestamps, setTimestamps] = useState<Record<string, string>>();
-  const [orderContents, setOrderContents] = useState<OrderItem[]>();
+  const [orderContents, setOrderContents] = useState<OrderItem[]>([]);
   const [pending, setPending] = useState<boolean>(true);
   const { id } = useParams();
 
@@ -88,46 +89,56 @@ export default function Tracking(props: props) {
       })
       .then((data) => {
         setOrderState(stringStatusToEnum(data.order.status));
-        setTimestamps(data.order.verbose)
+        setTimestamps(data.order.verbose);
       })
       .catch((e) => {
         console.error(
           "get order tracking error, if you see this message report to administrator"
         );
-        console.log(e)
-        toast("API error, please see dev console.")
+        console.log(e);
+        toast("API error, please see dev console.");
       });
 
+    // need to add another fetch to get order details, the fetch above only gets tracking
 
-      // need to add another fetch to get order details, the fetch above only gets tracking
-
-      fetch(`${import.meta.env.VITE_API_ENDPOINT}/getOrder?q=${id}`)
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/getOrder?q=${id}`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setOrderContents(data.orderItems)
+        setOrderContents(data.orderItems);
       })
       .catch((e) => {
         console.error(
           "getorder error, if you see this message report to administrator"
         );
-        console.log(e)
-        toast("API error, please see dev console.")
+        console.log(e);
+        toast("API error, please see dev console.");
       });
 
-      setPending(false)
-  }, []);
+    console.log(orderContents);
+    setPending(false);
+  }, [pending]);
+
+  setInterval(() => {
+    setPending(true);
+  }, 5000);
 
   return (
     <>
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        {
-          (orderState == 0) ? "Preparing Order" : (orderState == 1) ? "Awaiting Pickup" : (orderState == 2) ? "Collecting Order Items" : "Order Completed" 
-        }
+        {orderState == 0
+          ? "Preparing Order"
+          : orderState == 1
+          ? "Awaiting Pickup"
+          : orderState == 2
+          ? "Collecting Order Items"
+          : "Order Completed 🎉"}
       </h1>
       <p className="text-sm text-muted-foreground mb-10">Order ID: {id}</p>
-      <Progress value={orderState} />
+      <div className="px-4">
+        <Progress value={statusToProgressBarSize[orderState]} />
+      </div>
       {/* four steps: assign to worker, gathering, delivery, completed */}
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 gap-4">
         <Card
@@ -201,34 +212,116 @@ export default function Tracking(props: props) {
       <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl px-2">
         Order Details
       </h1>
-      <ul></ul>
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        className="w-[350px] space-y-2"
-      >
-        <div className="flex items-center justify-between space-x-4 px-4">
-          <h4 className="text-sm font-semibold">{orderContents?.length} items</h4>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <ChevronsUpDown className="h-4 w-4" />
-              <span className="sr-only">Toggle</span>
-            </Button>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent className="space-y-2">
-          {orderContents?.map((order, index) =>
-            Object.entries(order).map(([itemName, itemPrice]) => (
-              <div
-                key={index}
-                className="rounded-md border px-4 py-2 text-sm shadow-sm"
-              >
-                {itemName} (${itemPrice.toFixed(2)})
-              </div>
-            ))
-          )}
-        </CollapsibleContent>
-      </Collapsible>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4">
+        {pending == true || orderContents.length == 0 ? (
+          <Skeleton className="w-full h-full" />
+        ) : (
+          <Collapsible
+            open={isOpen}
+            onOpenChange={setIsOpen}
+            className="w-full space-y-2"
+          >
+            <div
+              className="flex items-center justify-between space-x-4 px-4"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <h4 className="text-sm font-semibold">
+                {pending == false &&
+                  orderContents.map(
+                    (order) => Object.entries(order).length
+                  )}{" "}
+                {orderContents.map((order) => Object.entries(order).length)[0] >
+                1
+                  ? "items"
+                  : "item"}
+              </h4>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <ChevronsUpDown className="h-4 w-4" />
+                  <span className="sr-only">Toggle</span>
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent className="space-y-2">
+              {orderContents?.map((order, index) =>
+                Object.entries(order).map(([itemName, itemPrice]) => (
+                  <div
+                    key={index}
+                    className="rounded-md border px-4 py-2 text-sm shadow-sm"
+                  >
+                    {itemName} (${itemPrice.toFixed(2)})
+                  </div>
+                ))
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+        {/* Time Details */}
+        {pending == true || timestamps == undefined ? (
+          <Skeleton className="w-full h-full" />
+        ) : (
+          <table border={1}>
+            <tbody>
+              {timestamps.placed_time ? (
+                <tr>
+                  <td>
+                    <strong>Order Placed At</strong>
+                  </td>
+                  <td>{new Date(timestamps.placed_time).toLocaleString()}</td>
+                </tr>
+              ) : (
+                ""
+              )}
+              {timestamps.accepted_by ? (
+                <tr>
+                  <td>
+                    <strong>Driver Name</strong>
+                  </td>
+                  <td>
+                    <code>{timestamps.accepted_by}</code>
+                  </td>
+                </tr>
+              ) : (
+                ""
+              )}
+              {timestamps.assignment_time ? (
+                <tr>
+                  <td>
+                    <strong>Driver Assigned At</strong>
+                  </td>
+                  <td>
+                    {new Date(timestamps.assignment_time).toLocaleString()}
+                  </td>
+                </tr>
+              ) : (
+                ""
+              )}
+              {timestamps.fufillment_time ? (
+                <tr>
+                  <td>
+                    <strong>Item Fufillment Time</strong>
+                  </td>
+                  <td>
+                    {new Date(timestamps.fufillment_time).toLocaleString()}
+                  </td>
+                </tr>
+              ) : (
+                ""
+              )}
+              {timestamps.pickup_time ? (
+                <tr>
+                  <td>
+                    <strong>Order Picked Up At</strong>
+                  </td>
+                  <td>{new Date(timestamps.pickup_time).toLocaleString()}</td>
+                </tr>
+              ) : (
+                ""
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
     </>
   );
 }
