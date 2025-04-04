@@ -30,6 +30,8 @@ import {
 
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from "./auth/AuthProvider";
+import { toast } from "sonner";
 
 type user = {
   name: string;
@@ -41,18 +43,18 @@ export function NavUser() {
   const { isMobile } = useSidebar();
 
   const [isPending, setIsPending] = useState(true);
-  const [isAuth, setIsAuth] = useState(false);
   const [userData, setUserData] = useState<user>();
+  const { login, logout, user } = useAuth();
 
   useEffect(() => {
-    let headers = {};
-    if (localStorage.getItem("token") != null) {
-      headers = {
-        Authorization: localStorage.getItem("token"),
-      };
+    if (user == undefined) {
+      setIsPending(false)
+      return
     }
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/me`, {
-      headers: headers,
+      headers: {
+        Authorization: user.token
+      },
     })
       .then((res) => {
         return res.json();
@@ -63,12 +65,11 @@ export function NavUser() {
           email: apiData.email,
           avatar: apiData.avatar,
         });
-        setIsPending(false);
-        setIsAuth(true);
       })
       .catch(() => {
         // non-200 response
-        setIsAuth(false);
+        // we assume the token has expired, or was forged, so it is destroyed
+        logout()
         setIsPending(false);
       });
   }, []);
@@ -90,7 +91,7 @@ export function NavUser() {
                 </div>
                 <Skeleton className="ml-auto h-4 w-4" />
               </SidebarMenuButton>
-            ) : isAuth ? (
+            ) : (user != undefined) ? (
               <SidebarMenuButton
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
