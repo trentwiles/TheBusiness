@@ -6,26 +6,37 @@ type AuthContextType = {
   logout: () => void;
 };
 
+import { toast } from "sonner";
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState<{username: string, token: string}>();
+  const [user, setUser] = useState<{ username: string; token: string }>();
 
   // send data here after the successful HTTP authentication has been made
   // ** WARNING ** provides no validation in and of itself
   // you'll have to send the token to the backend to ensure it is legit
   const login = (username: string, token: string) => {
-    const userData = {username: username, token: token}
+    const userData = { username: username, token: token };
     setUser(userData);
     localStorage.setItem("token", JSON.stringify(userData));
+
+    toast("Welcome back, you have been logged in.");
   };
 
   // call on Logout route
   const logout = () => {
-    setUser(undefined);
-    localStorage.removeItem("token");
+    if (user == undefined) {
+      localStorage.removeItem("token");
+      toast(
+        "Not quite sure why you'd log out while already logged out, but hey, you do you."
+      );
+    } else {
+      setUser(undefined);
+      localStorage.removeItem("token");
+
+      toast("You have been logged out.");
+    }
   };
 
   useEffect(() => {

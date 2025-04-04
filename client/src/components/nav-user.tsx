@@ -1,12 +1,8 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -31,7 +26,6 @@ import {
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "./auth/AuthProvider";
-import { toast } from "sonner";
 
 type user = {
   name: string;
@@ -44,13 +38,17 @@ export function NavUser() {
 
   const [isPending, setIsPending] = useState(true);
   const [userData, setUserData] = useState<user>();
-  const { login, logout, user } = useAuth();
+  const { logout, user } = useAuth();
 
   useEffect(() => {
     if (user == undefined) {
       setIsPending(false)
       return
     }
+
+    // why make an API call to /me when we already have username stored locally in browser?
+    // ensures that a username cannot be forged, and the username doesn't include information
+    // about the profile picture or email
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/me`, {
       headers: {
         Authorization: user.token
@@ -72,7 +70,7 @@ export function NavUser() {
         logout()
         setIsPending(false);
       });
-  }, []);
+  }, [user]);
 
   return (
     <SidebarMenu>

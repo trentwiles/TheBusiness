@@ -16,17 +16,23 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+
 # Serves as a "check-auth" route
 @app.route("/")
 def check_auth():
-    if ("Authorization" in request.headers):
+    if "Authorization" in request.headers:
         return jsonify(username="joe")
     return jsonify(), 401
 
+
 @app.route("/me")
 def auth_details():
-    if ("Authorization" in request.headers):
-        return jsonify(name="Trenty Poo", email="admin@trentwil.es", avatar="https://trentwil.es/a/KfKCobXBG0.png")
+    if "Authorization" in request.headers:
+        return jsonify(
+            name="Trenty Poo",
+            email="admin@trentwil.es",
+            avatar="https://trentwil.es/a/KfKCobXBG0.png",
+        )
     return jsonify(), 401
 
 
@@ -99,18 +105,20 @@ def test_data():
 
     return jsonify(orders=orders)
 
+
 @app.route("/getOrder")
 def get_order():
-    
+
     q = request.args.get("q", None)
     if q == None or q == "":
         return jsonify(error=True, error_msg="Please set a search query"), 400
-    
+
     for o in orders:
-        if o['id'] == q:
+        if o["id"] == q:
             return jsonify(o)
-    
+
     return jsonify(error=True, error_msg="Order not found. Was it deleted?"), 404
+
 
 # fake API login route
 @app.route("/login", methods=["POST"])
@@ -125,9 +133,21 @@ def login():
         return jsonify(login=False, error_msg="Missing username/password"), 400
 
 
+# fake API logout route (on a real backend, this would destroy the user's token)
+@app.route("/logout", methods=["POST"])
+def logout():
+    # assume the logout token is already in the authentication header
+    if "Authorization" in request.headers:
+        print(
+            "{token} deleted from database @ {ts}".format(
+                {request.headers["Authorization"], str(time.time())}
+            )
+        )
+        return jsonify(), 200
+    return jsonify(error_msg="failed to remove token on backend"), 400
+
+
 # fake sales data for a given order fufiller
-
-
 @app.route("/sales")
 def sales():
     sales = []
