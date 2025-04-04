@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { ChevronsUpDown, LoaderCircle } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
 import {
   Collapsible,

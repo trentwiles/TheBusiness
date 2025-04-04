@@ -22,7 +22,7 @@ type props = {
 export default function Login({ enableCreateAccount, enableOauth }: props) {
   const navigate = useNavigate();
 
-  const { login, logout, user } = useAuth();
+  const { login, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

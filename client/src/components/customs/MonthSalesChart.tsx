@@ -13,6 +13,9 @@ import {
 
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useAuth } from "./../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
+
 const chartConfig = {
   orders: {
     label: "orders",
@@ -71,7 +74,14 @@ export default function SalesChart({ month }: props) {
   // {month: "February", "value": 20},
   // ...
   // ]
+  const { user } = useAuth();
+  const navigate = useNavigate();
   useEffect(() => {
+    if (user == undefined) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/sales/${month}`)
       .then((res) => {
         return res.json();

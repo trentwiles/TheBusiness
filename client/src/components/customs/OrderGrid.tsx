@@ -1,10 +1,11 @@
-
-import Order from "./Order"
-import { Link } from 'react-router-dom';
-
+import Order from "./Order";
+import { Link } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import PlaceRequest from "./PlaceRequest";
+
+import { useAuth } from "./../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 // item and it's price
 export type OrderItem = {
@@ -25,13 +26,22 @@ type OrdersResponse = {
   orders: SingleOrder[];
 };
 
-
 export default function OrderGrid() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [data, setData] = useState<SingleOrder[]>([]);
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
+    // first check for authentication
+
+    if (user == undefined) {
+      navigate("/login", { replace: true });
+      return
+    }
+
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/orders`)
       .then((res) => {
         return res.json();
@@ -47,29 +57,24 @@ export default function OrderGrid() {
   }, []);
 
   return (
-        <>
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-            Current Orders
-          </h1>
-          {isLoading && <i>Please wait...</i>}
-          {isError && <span style={{ color: "red" }}></span>}
-          {data && (
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              
-              {data.map((order) => (
-                <Link to={`/track/${order.id}`} >
-                  <div
-                    key={order.id}
-                    className=""
-                  >
-                    <Order orderMetadata={order} />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-          <PlaceRequest />
-        </>
+    <>
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Current Orders
+      </h1>
+      {isLoading && <i>Please wait...</i>}
+      {isError && <span style={{ color: "red" }}></span>}
+      {data && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {data.map((order) => (
+            <Link to={`/track/${order.id}`}>
+              <div key={order.id} className="">
+                <Order orderMetadata={order} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+      <PlaceRequest />
+    </>
   );
 }
