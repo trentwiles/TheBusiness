@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import Home from "./components/customs/Home";
 
 import { AuthProvider } from "./components/auth/AuthProvider";
+import DasherQueue from "./components/customs/DasherQueue";
 
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
@@ -83,6 +84,14 @@ const App = () => {
     return <FourOhFour />;
   }
 
+  function DasherOrderQueue({ setPageTitle, setSubclass }) {
+    useEffect(() => {
+      setPageTitle("Order Queue");
+      setSubclass("Dasher");
+    }, []);
+    return <DasherQueue />;
+  }
+
   /* END PAGE DEFINITONS */
 
   return (
@@ -148,6 +157,15 @@ const App = () => {
               path="/track/:id"
               element={
                 <TrackingPage
+                  setSubclass={setSubclass}
+                  setPageTitle={setPageTitle}
+                />
+              }
+            />
+            <Route
+              path="/dasher/queue"
+              element={
+                <DasherOrderQueue
                   setSubclass={setSubclass}
                   setPageTitle={setPageTitle}
                 />
