@@ -28,10 +28,14 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
   // first things first, if the user is already authenticated, kick
   // them off this page
   useEffect(() => {
+    let headers = {};
+    if (localStorage.getItem("token") != null) {
+      headers = {
+        Authorization: localStorage.getItem("token"),
+      };
+    }
     fetch("http://localhost:5000", {
-      headers: {
-        Authorization: localStorage.getItem("token") || "",
-      },
+      headers: headers
     }).then((response) => {
       // if the user is authorized we get a 200
       if (response.status == 200) {

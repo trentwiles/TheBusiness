@@ -1,9 +1,15 @@
 import Sidebar from "./components/customs/Sidebar";
 // import OrderGrid from './components/customs/OrderGrid'
-import Login from './components/customs/Login'
+import Login from "./components/customs/Login";
+import Logout from "./components/customs/Logout";
 import Tracking from "./components/customs/Tracking";
+import FourOhFour from "./components/customs/FourOhFour";
+
 import { Status } from "./components/customs/Tracking";
-import OrderGrid, { SingleOrder, OrderItem } from "./components/customs/OrderGrid";
+import OrderGrid, {
+  SingleOrder,
+  OrderItem,
+} from "./components/customs/OrderGrid";
 import MonthSalesChart from "./components/customs/MonthSalesChart";
 import { SlidingChart } from "./components/customs/SlidingChart";
 import PlaceRequest from "./components/customs/PlaceRequest";
@@ -31,53 +37,60 @@ const App = () => {
 
   function LoginPage({ setPageTitle, setSubclass }) {
     useEffect(() => {
-      setPageTitle('Login');
+      setPageTitle("Login");
       setSubclass();
     }, []);
-  
+
     return <Login enableCreateAccount={false} enableOauth={false} />;
   }
 
   function OrdersPage({ setPageTitle, setSubclass }) {
     useEffect(() => {
-      setPageTitle('Orders');
-      setSubclass('Administrator');
+      setPageTitle("Orders");
+      setSubclass("Administrator");
     }, []);
-  
+
     return <OrderGrid />;
   }
 
   function MySales({ setPageTitle, setSubclass }) {
     useEffect(() => {
-      setPageTitle('Sales Charts');
-      setSubclass('Dasher');
+      setPageTitle("Sales Charts");
+      setSubclass("Dasher");
     }, []);
-  
+
     return <SlidingChart />;
   }
 
   function TrackingPage({ setPageTitle, setSubclass }) {
     useEffect(() => {
-      setPageTitle('Order Tracking')
-      setSubclass('Customer')
-    }, [])
+      setPageTitle("Order Tracking");
+      setSubclass("Customer");
+    }, []);
 
-    return <Tracking />
+    return <Tracking />;
   }
 
   function HomePage({ setPageTitle, setSubclass }) {
     useEffect(() => {
-      setPageTitle('')
-      setSubclass('')
-    }, [])
+      setPageTitle("");
+      setSubclass("");
+    }, []);
 
-    return <Home />
+    return <Home />;
+  }
+
+  function NotFound({ setPageTitle, setSubclass }) {
+    useEffect(() => {
+      setPageTitle("");
+      setSubclass("");
+    }, []);
+    return <FourOhFour />;
   }
 
   /* END PAGE DEFINITONS */
 
   return (
-    
     // <Sidebar children={<OrderGrid apiPath=`${import.meta.env.BASE_URL}/orders` />} />
     // <Sidebar children={<Login enableCreateAccount={false} enableOauth={false} />} />
     // <Sidebar
@@ -92,8 +105,6 @@ const App = () => {
 
     //  <Sidebar dataMode="Administrator" pageSubclass="Orders" pageTitle="More Information" children={<SlidingChart />}/>
 
-    
-
     <Router>
       <Sidebar
         dataMode="Administrator"
@@ -102,11 +113,60 @@ const App = () => {
       >
         {/* BEGIN CUSTOM ROUTES*/}
         <Routes>
-          <Route path="/" element={<HomePage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
-          <Route path="/orders" element={<OrdersPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
-          <Route path="/sales-chart" element={<MySales setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
-          <Route path="/login" element={<LoginPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
-          <Route path="/track/:id" element={<TrackingPage setSubclass={setSubclass} setPageTitle={setPageTitle} />} />
+          <Route
+            path="/"
+            element={
+              <HomePage setSubclass={setSubclass} setPageTitle={setPageTitle} />
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <OrdersPage
+                setSubclass={setSubclass}
+                setPageTitle={setPageTitle}
+              />
+            }
+          />
+          <Route
+            path="/sales-chart"
+            element={
+              <MySales setSubclass={setSubclass} setPageTitle={setPageTitle} />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                setSubclass={setSubclass}
+                setPageTitle={setPageTitle}
+              />
+            }
+          />
+          <Route
+            path="/track/:id"
+            element={
+              <TrackingPage
+                setSubclass={setSubclass}
+                setPageTitle={setPageTitle}
+              />
+            }
+          />
+          <Route
+            path="/logout"
+            element={
+              <Logout />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <NotFound
+                setSubclass={setSubclass}
+                setPageTitle={setPageTitle}
+              />
+            }
+          />
         </Routes>
         {/* END CUSTOM ROUTES*/}
         <Toaster />

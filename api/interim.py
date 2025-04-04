@@ -23,6 +23,12 @@ def check_auth():
         return jsonify(username="joe")
     return jsonify(), 401
 
+@app.route("/me")
+def auth_details():
+    if ("Authorization" in request.headers):
+        return jsonify(name="Trenty Poo", email="admin@trentwil.es", avatar="https://trentwil.es/a/KfKCobXBG0.png")
+    return jsonify(), 401
+
 
 orders = [
     {
