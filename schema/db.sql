@@ -40,12 +40,16 @@ CREATE TABLE supplier_store (
 -- notice the surrogate key here
 -- keeps preformance overhead low as tokens can get rather long, and
 -- we don't want them to be the primary key
+
+-- notice how user_id is has NOT NULL
+-- participation from auth_token to user is mandatory, therefore there
+-- can never be an auth token w/o a respective user
 CREATE TABLE auth_tokens (
 	id SERIAL PRIMARY KEY,
 	token VARCHAR(255) UNIQUE NOT NULL,
 	created TIMESTAMP DEFAULT now(),
 	expires TIMESTAMP DEFAULT (now() + '1 day'),
-	user_id REFERENCES users(id)
+	user_id INTEGER NOT NULL FOREIGN KEY (user_id) REFERENCES users(id)
 )
 
 -- searching from this, for the /search endpoint in the interim API

@@ -34,8 +34,16 @@ def auth_details():
             avatar="https://trentwil.es/a/KfKCobXBG0.png",
             privledge_level="Dasher"
         )
-    return jsonify(), 401
+    return jsonify(err_msg="Unauthorized"), 401
 
+@app.route("/me", methods=["PATCH"])
+def update_auth_details():
+    api = request.get_json()
+    
+    if "Authorization" in request.headers and "username" in api:
+        return jsonify(new_username=api["username"])
+    
+    return jsonify(err_msg="Unauthorized"), 400
 
 orders = [
     {

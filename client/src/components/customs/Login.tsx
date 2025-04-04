@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 
+import { Loader2 } from "lucide-react"
+
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "./../auth/AuthProvider";
@@ -137,8 +139,7 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
                   onClick={(e) => handleFormSubmit(e, email, password)}
                   disabled={!buttonEnabled}
                 >
-                  {/* {buttonEnabled ? "Login" : "Loading..."} */}
-                  Login
+                  {buttonEnabled ? "Login" : <><Loader2 className="animate-spin" /> Loading</>}
                 </Button>
                 {enableCreateAccount ? (
                   <Button variant="outline" className="w-full">

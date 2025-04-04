@@ -1,4 +1,4 @@
-# Quick Wagon
+# The Business
 
 ### Current Bugs
 
