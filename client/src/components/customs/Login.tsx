@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "./../auth/AuthProvider";
+
 type props = {
   enableCreateAccount: boolean;
   enableOauth: boolean;
@@ -20,28 +22,19 @@ type props = {
 export default function Login({ enableCreateAccount, enableOauth }: props) {
   const navigate = useNavigate();
 
+  const { login, logout, user } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [buttonEnabled, setButtonEnabled] = useState(true);
   const [loginFailureMessage, setLoginFailureMessage] = useState(null);
 
-  // first things first, if the user is already authenticated, kick
-  // them off this page
   useEffect(() => {
-    let headers = {};
-    if (localStorage.getItem("token") != null) {
-      headers = {
-        Authorization: localStorage.getItem("token"),
-      };
+    // check if the user is already authenicated on load
+    // if so kick them off
+    if (user != undefined) {
+      navigate("/", { replace: true });
     }
-    fetch("http://localhost:5000", {
-      headers: headers
-    }).then((response) => {
-      // if the user is authorized we get a 200
-      if (response.status == 200) {
-        navigate("/", { replace: true });
-      }
-    });
   }, []);
 
   function handleFormSubmit(e, email: string, password: string) {
@@ -72,15 +65,21 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
     }).then((response) => {
       setLoginFailureMessage(null);
       response.json().then((data) => {
+        // TWO CASES
+        // CASE #1 - ERROR FROM BACKEND (NON-200 HTTP STATUS)
         if (response.status != 200) {
           setButtonEnabled(true);
           setLoginFailureMessage(data.error_msg);
-        } else {
+        }
+        
+        // CASE #2 - GOOD RESPONSE FROM BACKEND
+        else {
           // was a success
           // handle the token here
           console.log(`success, your token is ${data.token}`);
-          localStorage.setItem("token", data.token);
-
+          // note: email isn't required to be an email, could be a username
+          // or in database terms, a PK for a user
+          login(email, data.token)
           navigate("/", { replace: true });
         }
       });
@@ -104,7 +103,7 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
             <form>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Username / Email</Label>
                   <Input
                     id="email"
                     type="email"
