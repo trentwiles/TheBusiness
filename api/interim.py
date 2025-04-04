@@ -32,6 +32,7 @@ def auth_details():
             name="Trenty Poo",
             email="admin@trentwil.es",
             avatar="https://trentwil.es/a/KfKCobXBG0.png",
+            privledge_level="Dasher"
         )
     return jsonify(), 401
 
