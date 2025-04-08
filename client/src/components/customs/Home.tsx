@@ -2,6 +2,7 @@ import { useAuth } from "./../auth/AuthProvider";
 import WelcomeHero from "@/components/customs/snippets/WelcomeHero";
 import { useEffect, useState } from "react";
 import AvailableButtons from "./snippets/AvailableButtons";
+import { LoaderCircle } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -11,7 +12,7 @@ export default function Home() {
   const [permLevel, setPermLevel] = useState("");
 
   useEffect(() => {
-    if (user == undefined) {
+    if (user === undefined) {
       setIsPending(false);
       return;
     }
@@ -29,7 +30,7 @@ export default function Home() {
         return res.json();
       })
       .then((apiData) => {
-        setPermLevel(apiData.privledge_level)
+        setPermLevel(apiData.privledge_level);
         setIsPending(false);
       })
       .catch(() => {
@@ -40,26 +41,25 @@ export default function Home() {
 
   return (
     <>
-      {!isPending ? (
-        user === undefined ? (
-          <WelcomeHero />
-        ) : (
-          <>
-            <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-              {new Date().getHours() >= 0 && new Date().getHours() <= 6
-                ? `Late night, huh ${user.username}?`
-                : new Date().getHours() > 6 && new Date().getHours() <= 12
-                ? `Good Morning, ${user.username}`
-                : new Date().getHours() > 12 && new Date().getHours() <= 18
-                ? `Good Afternoon, ${user.username}`
-                : `Good Evening, ${user.username}`}
-            </h2>
-            <p>Debug: Perms level, </p>
-            <AvailableButtons perm_level={permLevel} />
-          </>
-        )
+      {isPending ? (
+        <div className="flex items-center justify-center h-screen">
+          <LoaderCircle className="h-12 w-12 animate-spin text-muted-foreground" />
+        </div>
+      ) : user === undefined ? (
+        <WelcomeHero />
       ) : (
-        <p>Loading...</p>
+        <>
+          <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+            {new Date().getHours() >= 0 && new Date().getHours() <= 6
+              ? `Late night, huh ${user.username}?`
+              : new Date().getHours() > 6 && new Date().getHours() <= 12
+              ? `Good Morning, ${user.username}`
+              : new Date().getHours() > 12 && new Date().getHours() <= 18
+              ? `Good Afternoon, ${user.username}`
+              : `Good Evening, ${user.username}`}
+          </h2>
+          <AvailableButtons perm_level={permLevel} />
+        </>
       )}
     </>
   );

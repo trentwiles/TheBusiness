@@ -1,5 +1,5 @@
 import Sidebar from "./components/customs/Sidebar";
-import OrderGrid from './components/customs/OrderGrid'
+import OrderGrid from "./components/customs/OrderGrid";
 import Login from "./components/customs/Login";
 import Logout from "./components/auth/Logout";
 import Tracking from "./components/customs/Tracking";
@@ -16,6 +16,8 @@ import Home from "./components/customs/Home";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import DasherQueue from "./components/customs/DasherQueue";
 
+import RouteWrapper from "@/components/routing/RouterWrapper";
+
 const App = () => {
   // const orderItemOne: OrderItem = { Lemonade: 2.39 };
   // const orderItemTwo: OrderItem = { "Coke Zero": 12.45 };
@@ -27,6 +29,7 @@ const App = () => {
   //   orderItems: [orderItemTwo, orderItemOne],
   // };
   const [subclass, setSubclass] = useState("");
+  const [subclassTo, setSubclassTo] = useState("");
   const [pageTitle, setPageTitle] = useState("");
 
   /* PAGE DEFINITIONS */
@@ -113,6 +116,7 @@ const App = () => {
         <Sidebar
           dataMode="Administrator"
           pageSubclass={subclass}
+          pageSubclassTo={subclassTo}
           pageTitle={pageTitle}
         >
           {/* BEGIN CUSTOM ROUTES*/}
@@ -165,19 +169,46 @@ const App = () => {
             <Route
               path="/dasher/queue"
               element={
-                <DasherOrderQueue
-                  setSubclass={setSubclass}
+                <RouteWrapper
+                  element={DasherQueue}
+                  title="Dasher Order Queue"
+                  subclass="Dasher"
+                  subclassLink="/dasher"
                   setPageTitle={setPageTitle}
+                  setSubclass={setSubclass}
+                  setSubclassLink={setSubclassTo}
                 />
               }
             />
-            <Route path="/logout" element={<Logout />} />
+            <Route
+              path="/logout"
+              element={
+                // <NotFound
+                //   setSubclass={setSubclass}
+                //   setPageTitle={setPageTitle}
+                // />
+                <RouteWrapper
+                  element={Logout}
+                  title="Log Out"
+                  setPageTitle={setPageTitle}
+                  setSubclass={setSubclass}
+                  setSubclassLink={setSubclassTo}
+                />
+              }
+            />
             <Route
               path="*"
               element={
-                <NotFound
-                  setSubclass={setSubclass}
+                // <NotFound
+                //   setSubclass={setSubclass}
+                //   setPageTitle={setPageTitle}
+                // />
+                <RouteWrapper
+                  element={FourOhFour}
+                  title="404: Not Found"
                   setPageTitle={setPageTitle}
+                  setSubclass={setSubclass}
+                  setSubclassLink={setSubclassTo}
                 />
               }
             />

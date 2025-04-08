@@ -6,6 +6,7 @@ type props = {
   children: React.ReactNode;
   dataMode: "Customer" | "Dasher" | "Administrator";
   pageSubclass?: string;
+  pageSubclassTo?: string;
   pageTitle?: string;
 };
 
@@ -13,7 +14,7 @@ export default function Sidebar(props: props) {
   return (
     <div className="[--header-height:calc(theme(spacing.14))]">
       <SidebarProvider className="flex flex-col">
-        <SiteHeader subclass={props.pageSubclass} pageName={props.pageTitle} />
+        <SiteHeader subclass={props.pageSubclass} pageName={props.pageTitle}  />
         <div className="flex flex-1">
           <AppSidebar  dataMode={props.dataMode} />
           <SidebarInset>

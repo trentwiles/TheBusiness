@@ -12,9 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
 
 type props = {
   subclass?: string;
+  subclassTo?: string;
   pageName?: string;
 };
 
@@ -38,9 +40,9 @@ export function SiteHeader(props: props) {
           {props.subclass && props.pageName && (
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink>
-                  {props.subclass}
-                </BreadcrumbLink>
+                <Link to={props.subclassTo ? props.subclassTo : "/"}>
+                  <BreadcrumbLink>{props.subclass}</BreadcrumbLink>
+                </Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
