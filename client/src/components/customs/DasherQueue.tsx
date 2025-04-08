@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./../auth/AuthProvider";
 import { useEffect, useState } from "react";
@@ -7,6 +8,9 @@ export default function DasherQueue() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(true);
+
+  const [currentOrders, setCurrentOrders] = useState()
+  const [availableOrders, setAvailableOrders] = useState()
 
   // first, ensure that the user has the dasher role
   // otherwise send them to the "missing role"/"locked" page
@@ -42,6 +46,10 @@ export default function DasherQueue() {
         return;
       });
 
+    // todo: http request to get dasher jobs
+
+    setIsPending(false);
+
     // if we've made it this far, we know the user has a privledge level of "dasher"
     // see layout: https://www.notion.so/trentwiles/QuickWagon-Dasher-Queue-1cbb34a7509c80be8e8fd0692796513a
   }, [user]);
@@ -51,9 +59,23 @@ export default function DasherQueue() {
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Available Orders
       </h1>
+      {isPending ? (
+        <div className="w-full max-w-md p-4">
+          <Skeleton className="w-full h-4 rounded" />
+        </div>
+      ) : (
+        ``
+      )}
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Accepted Orders
       </h1>
+      {isPending ? (
+        <div className="w-full max-w-md p-4">
+          <Skeleton className="w-full h-4 rounded" />
+        </div>
+      ) : (
+        ``
+      )}
     </>
   );
 }

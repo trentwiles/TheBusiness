@@ -136,7 +136,7 @@ const App = () => {
               }
             />
             <Route
-              path="/sales-chart"
+              path="/dasher/sales"
               element={
                 <MySales
                   setSubclass={setSubclass}

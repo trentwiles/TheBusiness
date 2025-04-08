@@ -1,0 +1,33 @@
+[
+  {
+    "sample.type": "order",
+    "data": {
+      "orderTitle": "Available Order 2",
+      "orderItems": [
+        {
+          "Green Beans": 14.38,
+          "Water": 1.12,
+          "Coca-Cola": 10.74,
+          "Potatoes": 7.29
+        }
+      ],
+      "client": "Richard",
+      "id": "6f407e6f-dcb4-42f1-a0c5-1e7cc36473d8"
+    }
+  },
+  {
+    "sample.type": "orderStatus",
+    "data": {
+      "orderID": "b32c78d6-eec1-4134-b302-7b78c6a841df",
+      "status": "Completed",
+      "verbose": {
+        "placed_time": "%Y-%m-%d %H:%M:%S",
+        "assignment_time": "%Y-%m-%d %H:%M:%S",
+        "accepted_by": "david",
+        "fufillment_time": "%Y-%m-%d %H:%M:%S",
+        "pickup_time": "%Y-%m-%d %H:%M:%S"
+      },
+      "notes": ""
+    }
+  }
+]

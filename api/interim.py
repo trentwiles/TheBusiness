@@ -32,18 +32,20 @@ def auth_details():
             name="Trenty Poo",
             email="admin@trentwil.es",
             avatar="https://trentwil.es/a/KfKCobXBG0.png",
-            privledge_level="Dasher"
+            privledge_level="Dasher",
         )
     return jsonify(err_msg="Unauthorized"), 401
+
 
 @app.route("/me", methods=["PATCH"])
 def update_auth_details():
     api = request.get_json()
-    
+
     if "Authorization" in request.headers and "username" in api:
         return jsonify(new_username=api["username"])
-    
+
     return jsonify(err_msg="Unauthorized"), 400
+
 
 orders = [
     {
@@ -396,6 +398,42 @@ def trackOrder():
             return jsonify(order=order)
 
     return jsonify(error=True, error_msg="orderID not found, was it deleted?"), 404
+
+
+@app.route("/available-orders")
+def availableOrders():
+    # Same exact format as /orders
+    # Available for dashers only
+    available = [
+        {
+            "orderTitle": "Available Order 1",
+            "orderItems": [{"Milk": 4.59, "Cheese": 15.12}],
+            "client": "Alexander",
+            "id": "3d3a62ec-25f8-4bb9-b9cb-2f79c37642f4",
+        },
+        {
+            "orderTitle": "Available Order 2",
+            "orderItems": [
+                {
+                    "Green Beans": 14.38,
+                    "Water": 1.12,
+                    "Coca-Cola": 10.74,
+                    "Potatoes": 7.29,
+                }
+            ],
+            "client": "Richard",
+            "id": "6f407e6f-dcb4-42f1-a0c5-1e7cc36473d8",
+        },
+    ]
+    return jsonify(availableOrders=available)
+
+
+@app.route("/acceptOrder", methods=["POST"])
+def acceptOrder():
+    api = request.get_json()
+    if "orderID" in api:
+        return jsonify(error=False), 200
+    return jsonify(error=True, error_msg="Missing 'orderID' in JSON body"), 400
 
 
 if __name__ == "__main__":
