@@ -28,9 +28,10 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     if (user == undefined) {
       localStorage.removeItem("token");
-      toast(
-        "Not quite sure why you'd log out while already logged out, but hey, you do you."
-      );
+      // toast(
+      //   "Not quite sure why you'd log out while already logged out, but hey, you do you."
+      // );
+      // ^^^ message above was being triggered multiple times, so it has been blanked out
     } else {
       setUser(undefined);
       localStorage.removeItem("token");

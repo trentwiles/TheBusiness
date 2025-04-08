@@ -13,10 +13,10 @@ export default function DasherQueue() {
   // https://trentwil.es/a/w6XEd5mTxb.png
   // bug ^^^
   useEffect(() => {
-    console.log(user)
+    console.log(user);
     if (user == undefined) {
       navigate("/login", { replace: true });
-      return
+      return;
     }
 
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/me`, {
@@ -28,10 +28,10 @@ export default function DasherQueue() {
         return res.json();
       })
       .then((apiData) => {
-        console.log(apiData.privledge_level != "Dasher")
+        console.log(apiData.privledge_level != "Dasher");
         if (apiData.privledge_level != "Dasher") {
           navigate("/403", { replace: true });
-          return
+          return;
         }
       })
       .catch(() => {
@@ -39,7 +39,7 @@ export default function DasherQueue() {
         // we assume the token has expired, or was forged, so it is destroyed
         logout();
         navigate("/login", { replace: true });
-        return
+        return;
       });
 
     // if we've made it this far, we know the user has a privledge level of "dasher"
@@ -49,7 +49,10 @@ export default function DasherQueue() {
   return (
     <>
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        The Business
+        Available Orders
+      </h1>
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Accepted Orders
       </h1>
     </>
   );
