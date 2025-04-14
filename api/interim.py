@@ -435,6 +435,7 @@ def acceptOrder():
         return jsonify(error=False), 200
     return jsonify(error=True, error_msg="Missing 'orderID' in JSON body"), 400
 
+# @app.route("/searchPages", methods=["POST"])
 
 if __name__ == "__main__":
     app.run(debug=True)

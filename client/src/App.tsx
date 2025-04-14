@@ -5,7 +5,6 @@ import Logout from "./components/auth/Logout";
 import Tracking from "./components/customs/Tracking";
 import FourOhFour from "./components/customs/FourOhFour";
 
-import { SlidingChart } from "./components/customs/SlidingChart";
 import { Toaster } from "@/components/ui/sonner";
 
 /* react router related */
@@ -18,6 +17,7 @@ import DasherQueue from "./components/customs/DasherQueue";
 
 import RouteWrapper from "@/components/routing/RouterWrapper";
 import SalesChart from "./components/customs/MonthSalesChart";
+import SearchResults from "./components/customs/snippets/SearchResults";
 
 const App = () => {
   const [subclass, setSubclass] = useState("");
@@ -84,10 +84,6 @@ const App = () => {
             <Route
               path="/login"
               element={
-                // <LoginPage
-                //   setSubclass={setSubclass}
-                //   setPageTitle={setPageTitle}
-                // />
                 <RouteWrapper
                   element={() => (
                     <Login enableCreateAccount={false} enableOauth={false} />
@@ -132,10 +128,6 @@ const App = () => {
             <Route
               path="/logout"
               element={
-                // <NotFound
-                //   setSubclass={setSubclass}
-                //   setPageTitle={setPageTitle}
-                // />
                 <RouteWrapper
                   element={Logout}
                   title="Log Out"
@@ -146,12 +138,20 @@ const App = () => {
               }
             />
             <Route
+              path="/search/:q"
+              element={
+                <RouteWrapper
+                  element={SearchResults}
+                  title="Search Results"
+                  setPageTitle={setPageTitle}
+                  setSubclass={setSubclass}
+                  setSubclassLink={setSubclassTo}
+                />
+              }
+            />
+            <Route
               path="*"
               element={
-                // <NotFound
-                //   setSubclass={setSubclass}
-                //   setPageTitle={setPageTitle}
-                // />
                 <RouteWrapper
                   element={FourOhFour}
                   title="404: Not Found"

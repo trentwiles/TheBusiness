@@ -1,15 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./../auth/AuthProvider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Check, X } from "lucide-react";
 import PossibleOrderButton from "./snippets/PossibleOrderButton";
 
 export default function DasherQueue() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(true);
 
@@ -21,9 +18,10 @@ export default function DasherQueue() {
   // https://trentwil.es/a/w6XEd5mTxb.png
   // bug ^^^
   useEffect(() => {
-    console.log(user);
+    if (loading) return
+
     if (user == undefined) {
-      // navigate("/login", { replace: true });
+      navigate("/login", { replace: true });
       toast("You are not logged in, and therefore cannot see this page.")
       return;
     }
@@ -61,7 +59,7 @@ export default function DasherQueue() {
 
     // if we've made it this far, we know the user has a privledge level of "dasher"
     // see layout: https://www.notion.so/trentwiles/QuickWagon-Dasher-Queue-1cbb34a7509c80be8e8fd0692796513a
-  }, [user]);
+  }, [user, loading]);
 
   return (
     <>

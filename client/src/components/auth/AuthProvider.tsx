@@ -4,6 +4,7 @@ type AuthContextType = {
   user?: { username: string; token: string };
   login: (username: string, token: string) => void;
   logout: () => void;
+  loading: boolean;
 };
 
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState<{ username: string; token: string }>();
+  const [loading, setLoading] = useState(true);
 
   // send data here after the successful HTTP authentication has been made
   // ** WARNING ** provides no validation in and of itself
@@ -45,10 +47,12 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    setLoading(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

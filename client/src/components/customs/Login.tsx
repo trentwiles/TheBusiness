@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "./../auth/AuthProvider";
+import { toast } from "sonner";
 
 type props = {
   enableCreateAccount: boolean;
@@ -24,7 +25,7 @@ type props = {
 export default function Login({ enableCreateAccount, enableOauth }: props) {
   const navigate = useNavigate();
 
-  const { login, user } = useAuth();
+  const { login, user, loading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,14 +33,20 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
   const [loginFailureMessage, setLoginFailureMessage] = useState(null);
 
   useEffect(() => {
+    if (loading) return
     // check if the user is already authenicated on load
     // if so kick them off
     if (user != undefined) {
+      toast("You are already logged in. To log into another account, please sign out first.")
       navigate("/", { replace: true });
     }
-  }, []);
+  }, [user, loading]);
 
-  function handleFormSubmit(e, email: string, password: string) {
+  function handleFormSubmit(
+    e: React.MouseEvent,
+    email: string,
+    password: string
+  ) {
     e.preventDefault();
 
     // reset login failure message
@@ -73,7 +80,7 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
           setButtonEnabled(true);
           setLoginFailureMessage(data.error_msg);
         }
-        
+
         // CASE #2 - GOOD RESPONSE FROM BACKEND
         else {
           // was a success
@@ -81,7 +88,7 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
           console.log(`success, your token is ${data.token}`);
           // note: email isn't required to be an email, could be a username
           // or in database terms, a PK for a user
-          login(email, data.token)
+          login(email, data.token);
           navigate("/", { replace: true });
         }
       });
@@ -139,7 +146,13 @@ export default function Login({ enableCreateAccount, enableOauth }: props) {
                   onClick={(e) => handleFormSubmit(e, email, password)}
                   disabled={!buttonEnabled}
                 >
-                  {buttonEnabled ? "Login" : <><Loader2 className="animate-spin" /> Loading</>}
+                  {buttonEnabled ? (
+                    "Login"
+                  ) : (
+                    <>
+                      <Loader2 className="animate-spin" /> Loading
+                    </>
+                  )}
                 </Button>
                 {enableCreateAccount ? (
                   <Button variant="outline" className="w-full">
