@@ -435,7 +435,23 @@ def acceptOrder():
         return jsonify(error=False), 200
     return jsonify(error=True, error_msg="Missing 'orderID' in JSON body"), 400
 
-# @app.route("/searchPages", methods=["POST"])
+
+@app.route("/searchPages", methods=["POST"])
+def searchPages():
+    # in production this will pull from a precompiled list from all pages
+    # this is just a demo so i'm using a fixed list
+    pages = [
+        {"title": "Home", "path": "/"},
+        {"title": "Orders", "path": "/orders"},
+        {"title": "Support", "path": "/support"},
+    ]
+    
+    api = request.get_json()
+    if "q" not in api:
+        return jsonify(error=True, error_msg="please set a search query 'q'")
+    
+    return jsonify([item for item in pages if str(q).lower() in item["title"].lower()])
+
 
 if __name__ == "__main__":
     app.run(debug=True)
