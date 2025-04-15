@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 
 import { OrderItem } from "@/components/customs/OrderGrid";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Card,
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/collapsible";
 
 import { toast } from "sonner";
+import { useAuth } from "../auth/AuthProvider";
 
 enum Status {
   Preparing,
@@ -75,6 +76,8 @@ type props = {
 };
 
 export default function Tracking(props: props) {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [orderState, setOrderState] = useState<Status>(Status.Awaiting);
   const [timestamps, setTimestamps] = useState<Record<string, string>>();
@@ -83,6 +86,15 @@ export default function Tracking(props: props) {
   const { id } = useParams();
 
   useEffect(() => {
+    // first check for user authentication
+    if (loading) return;
+
+    if (user === undefined) {
+      toast("Please sign in to view order status.")
+      navigate("/login", { replace: true });
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/getOrderTrackingStatus?q=${id}`)
       .then((res) => {
         return res.json();
@@ -118,7 +130,7 @@ export default function Tracking(props: props) {
 
     console.log(orderContents);
     setPending(false);
-  }, [pending]);
+  }, [loading, user, pending]);
 
   setInterval(() => {
     setPending(true);

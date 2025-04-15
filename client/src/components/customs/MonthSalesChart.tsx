@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAuth } from "./../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const chartConfig = {
   orders: {
@@ -74,10 +75,13 @@ export default function SalesChart({ month }: props) {
   // {month: "February", "value": 20},
   // ...
   // ]
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
+    if (loading) return
+
     if (user == undefined) {
+      toast("Please sign in to view monthly sales.")
       navigate("/login", { replace: true });
       return;
     }

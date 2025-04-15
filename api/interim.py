@@ -400,7 +400,7 @@ def trackOrder():
     return jsonify(error=True, error_msg="orderID not found, was it deleted?"), 404
 
 
-@app.route("/available-orders")
+@app.route("/takenOrdersAndPossibleOrders")
 def availableOrders():
     # Same exact format as /orders
     # Available for dashers only
@@ -425,7 +425,7 @@ def availableOrders():
             "id": "6f407e6f-dcb4-42f1-a0c5-1e7cc36473d8",
         },
     ]
-    return jsonify(availableOrders=available)
+    return jsonify(availableOrders=available, acceptedOrders=[])
 
 
 @app.route("/acceptOrder", methods=["POST"])
