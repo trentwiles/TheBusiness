@@ -28,6 +28,36 @@ type apiResponse = {
   acceptedOrders: orderMetadata[];
 };
 
+// order accept function
+const orderNegociate = (
+  userToken: string,
+  id: string,
+  hasAccepted: boolean
+): void => {
+  fetch(`${import.meta.env.VITE_API_ENDPOINT}/negociateOrder`, {
+    method: "POST",
+    headers: {
+      Authorization: userToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      orderID: id,
+      status: hasAccepted,
+    }),
+  })
+    .then((res) => {
+      if (res.status === 200) {
+        toast(hasAccepted ? "Order accepted! We're now adding it to your current orders." : "Order rejected. You shouldn't see it again.")
+      } else {
+        toast("Unable to negociate order. HTTP Status " + res.status)
+      }
+    })
+    .catch((error) => {
+      toast("Unable to connect to API: " + error)
+    });
+};
+
+
 export default function DasherQueue() {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +67,8 @@ export default function DasherQueue() {
   const [availableOrders, setAvailableOrders] = useState<orderMetadata[]>();
 
   const refreshOrders = (userInfo) => {
-    fetch(`${import.meta.env.VITE_API_ENDPOINT}/me`, {
+    setIsPending(true);
+    fetch(`${import.meta.env.VITE_API_ENDPOINT}/takenOrdersAndPossibleOrders`, {
       headers: {
         Authorization: userInfo.token,
       },
@@ -49,6 +80,7 @@ export default function DasherQueue() {
         setAvailableOrders(apiData.availableOrders);
         setCurrentOrders(apiData.acceptedOrders);
       });
+    setIsPending(false);
   };
 
   // first, ensure that the user has the dasher role
@@ -117,21 +149,24 @@ export default function DasherQueue() {
         </div>
       ) : (
         <>
-          <PossibleOrderButton
-            customer="Darius"
-            orderID={9835454}
-            orderTitle="$100 order with 28 items"
-          />
-          <PossibleOrderButton
-            customer="Frank"
-            orderID={98542984}
-            orderTitle="$120 order with 23 items"
-          />
-          <PossibleOrderButton
-            customer="Darius"
-            orderID={2984895}
-            orderTitle="$60 order with 6 items"
-          />
+          {availableOrders !== undefined &&
+            availableOrders.map((order) => (
+              <PossibleOrderButton
+                customer={order.client}
+                orderID={order.id}
+                orderTitle={`$${order.orderItems
+                  .flatMap((itemObj) => Object.values(itemObj))
+                  .reduce((sum, val) => sum + val, 0)
+                  .toFixed(2)} order with ${
+                  Object.keys(order.orderItems[0] ?? {}).length
+                } ${
+                  Object.keys(order.orderItems[0] ?? {}).length == 1
+                    ? "item"
+                    : "items"
+                }`}
+                negociateFunction={orderNegociate}
+              />
+            ))}
         </>
       )}
       <h1 className="scroll-m-20 mb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">

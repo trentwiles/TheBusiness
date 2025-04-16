@@ -428,12 +428,20 @@ def availableOrders():
     return jsonify(availableOrders=available, acceptedOrders=[])
 
 
-@app.route("/acceptOrder", methods=["POST"])
+@app.route("/negociateOrder", methods=["POST"])
 def acceptOrder():
+    # orderID -> ID of the order
+    # status -> true if dasher accepts, false if dasher declines
+    # curl -X POST localhost/negociateOrder -d '{"orderID": "12345", "status": true}'
     api = request.get_json()
-    if "orderID" in api:
+    if "orderID" in api and "status" in api:
+        if api["status"] != True and api["status"] != False:
+            return (
+                jsonify(error=True, error_msg="`status` must be of type boolean"),
+                400,
+            )
         return jsonify(error=False), 200
-    return jsonify(error=True, error_msg="Missing 'orderID' in JSON body"), 400
+    return jsonify(error=True, error_msg="Missing 'orderID'/'status' in JSON body"), 400
 
 
 @app.route("/searchPages", methods=["POST"])
@@ -445,11 +453,11 @@ def searchPages():
         {"title": "Orders", "path": "/orders"},
         {"title": "Support", "path": "/support"},
     ]
-    
+
     api = request.get_json()
     if "q" not in api:
         return jsonify(error=True, error_msg="please set a search query 'q'")
-    
+
     return jsonify([item for item in pages if str(q).lower() in item["title"].lower()])
 
 
