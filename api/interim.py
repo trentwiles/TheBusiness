@@ -425,7 +425,7 @@ def availableOrders():
             "id": "6f407e6f-dcb4-42f1-a0c5-1e7cc36473d8",
         },
     ]
-    return jsonify(availableOrders=available, acceptedOrders=[])
+    return jsonify(availableOrders=available, acceptedOrders=available)
 
 
 @app.route("/negociateOrder", methods=["POST"])

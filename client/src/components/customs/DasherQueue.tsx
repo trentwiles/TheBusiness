@@ -4,6 +4,7 @@ import { useAuth } from "./../auth/AuthProvider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import PossibleOrderButton from "./snippets/PossibleOrderButton";
+import { Card } from "@/components/ui/card"
 
 // {
 //   "orderTitle": "Available Order 1",
@@ -47,16 +48,19 @@ const orderNegociate = (
   })
     .then((res) => {
       if (res.status === 200) {
-        toast(hasAccepted ? "Order accepted! We're now adding it to your current orders." : "Order rejected. You shouldn't see it again.")
+        toast(
+          hasAccepted
+            ? "Order accepted! We're now adding it to your current orders."
+            : "Order rejected. You shouldn't see it again."
+        );
       } else {
-        toast("Unable to negociate order. HTTP Status " + res.status)
+        toast("Unable to negociate order. HTTP Status " + res.status);
       }
     })
     .catch((error) => {
-      toast("Unable to connect to API: " + error)
+      toast("Unable to connect to API: " + error);
     });
 };
-
 
 export default function DasherQueue() {
   const { user, logout, loading } = useAuth();
@@ -67,20 +71,27 @@ export default function DasherQueue() {
   const [availableOrders, setAvailableOrders] = useState<orderMetadata[]>();
 
   const refreshOrders = (userInfo) => {
-    setIsPending(true);
     fetch(`${import.meta.env.VITE_API_ENDPOINT}/takenOrdersAndPossibleOrders`, {
       headers: {
         Authorization: userInfo.token,
       },
     })
       .then((res) => {
-        return res.json();
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          throw new Error(`Failed to fetch orders. Status: ${res.status}`);
+        }
       })
       .then((apiData: apiResponse) => {
-        setAvailableOrders(apiData.availableOrders);
-        setCurrentOrders(apiData.acceptedOrders);
-      });
-    setIsPending(false);
+        // shallow copy to force refresh, even if data is the same
+        setAvailableOrders(JSON.parse(JSON.stringify(apiData.availableOrders)));
+        setCurrentOrders(JSON.parse(JSON.stringify(apiData.acceptedOrders)));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast("Unable to fetch orders from API");
+      })
   };
 
   // first, ensure that the user has the dasher role
@@ -144,14 +155,24 @@ export default function DasherQueue() {
         Available Orders
       </h1>
       {isPending ? (
-        <div className="w-full max-w-md p-4">
-          <Skeleton className="w-full h-4 rounded" />
-        </div>
+        <Card className="w-full mb-2 p-4">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <Skeleton className="h-5 w-40 mb-1" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+            <div className="flex space-x-2">
+              <Skeleton className="h-9 w-20 rounded-md" />
+              <Skeleton className="h-9 w-20 rounded-md" />
+            </div>
+          </div>
+        </Card>
       ) : (
         <>
           {availableOrders !== undefined &&
             availableOrders.map((order) => (
               <PossibleOrderButton
+                key={order.id}
                 customer={order.client}
                 orderID={order.id}
                 orderTitle={`$${order.orderItems
