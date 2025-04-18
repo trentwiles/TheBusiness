@@ -4,6 +4,7 @@ import { useAuth } from "./../auth/AuthProvider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import PossibleOrderButton from "./snippets/PossibleOrderButton";
+import ConfirmedOrder from "./snippets/ConfirmedOrder";
 import { Card } from "@/components/ui/card"
 
 // {
@@ -198,7 +199,26 @@ export default function DasherQueue() {
           <Skeleton className="w-full h-4 rounded" />
         </div>
       ) : (
-        
+        <>
+          {currentOrders !== undefined &&
+            currentOrders.map((order) => (
+              <ConfirmedOrder
+                key={order.id}
+                customer={order.client}
+                orderID={order.id}
+                orderTitle={`$${order.orderItems
+                  .flatMap((itemObj) => Object.values(itemObj))
+                  .reduce((sum, val) => sum + val, 0)
+                  .toFixed(2)} order with ${
+                  Object.keys(order.orderItems[0] ?? {}).length
+                } ${
+                  Object.keys(order.orderItems[0] ?? {}).length == 1
+                    ? "item"
+                    : "items"
+                }`}
+              />
+            ))}
+        </>
       )}
     </>
   );

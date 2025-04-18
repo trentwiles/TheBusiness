@@ -70,7 +70,7 @@ export default function ConfirmOrderButton(props: props) {
             {/* Collecting => "Confirm Customer Exchange" */}
             {pending ? (
               <Skeleton className="h-10 w-32 rounded-md" />
-            ) : orderStatus == "Preparing" ? (
+            ) : orderStatus == "Collecting" ? (
               <Button variant="secondary">Confirm Item Pickup</Button>
             ) : (
               <Button variant="secondary">Confirm Customer Exchange</Button>
