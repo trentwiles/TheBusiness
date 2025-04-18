@@ -1,7 +1,7 @@
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 type props = {
@@ -17,8 +17,9 @@ type props = {
 };
 
 export default function PossibleOrderButton(props: props) {
-  const { user, logout, loading } = useAuth();
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
+
   return (
     <>
       {isVisible && (
